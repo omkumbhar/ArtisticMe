@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "609992937088",
+    "firebase_url": "https://artisticme-42a7d.firebaseio.com",
+    "project_id": "artisticme-42a7d",
+    "storage_bucket": "artisticme-42a7d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:609992937088:android:c727b84c1863c2aabae065",
+        "android_client_info": {
+          "package_name": "com.code_crawler.artisticme"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "609992937088-1q9rmih7im3bniksg0pp9oe6s2q5e5gt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.code_crawler.artisticme",
+            "certificate_hash": "efffe445b9ae724110b185ced28b6a0dfdefbbef"
+          }
+        },
+        {
+          "client_id": "609992937088-2j7024qsm8e8pv25egdttf96r705ea6c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB1qzVWyeiacFkb3QzZOraEm4-0WulDkkU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "609992937088-2j7024qsm8e8pv25egdttf96r705ea6c.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
