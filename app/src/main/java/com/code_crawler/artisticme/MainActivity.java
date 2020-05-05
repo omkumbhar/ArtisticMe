@@ -5,12 +5,14 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
@@ -21,6 +23,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         auth = FirebaseAuth.getInstance();
+
+
+        createDirectory();
 
 
         if (auth.getCurrentUser() == null){
@@ -37,6 +42,13 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private void createDirectory() {
+        String DirectoryPath = Environment.getExternalStorageDirectory()+"/Artwork";
+        File dir = new File(DirectoryPath);
+        if( !dir.exists())
+            dir.mkdir();
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -51,12 +63,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void launchActivity(FirebaseUser currentUser) {
-        /*Intent i = new Intent(this,MainActivity.class);
+        Intent i = new Intent(this,HomeActivity.class);
         i.putExtra("name",currentUser.getDisplayName());
         i.putExtra("email",currentUser.getEmail());
         startActivity(i);
-        finish();*/
-        Toast.makeText(this, "Already logged in user", Toast.LENGTH_SHORT).show();
+        finish();
+        //Toast.makeText(this, "Already logged in user", Toast.LENGTH_SHORT).show();
 
     }
 }
