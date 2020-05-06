@@ -57,53 +57,6 @@ public class HomeActivity extends AppCompatActivity {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        //String [] foldernmaes = { "Calligraphy","Digital","Painting","Carricature"};
-
-        //ArrayList<File> folderPaths   = SelectFiles();
-
-
-
-        //gridAdapter = new GridAdapter(this,foldernmaes);
-        //gridView.setAdapter(gridAdapter);
-
-
-
-
-
-
-
-
-
-
-
-
-
     }
 
     private void requestPermission() {
@@ -121,22 +74,17 @@ public class HomeActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         if (requestCode == REQUEST_WRITE_PERMISSION && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            loadFolders(SelectFiles());
+            loadFolders(Objects.requireNonNull(SelectFiles()));
         }
     }
 
     private void loadFolders(ArrayList<File> selectFiles) {
         Uri uri;
-        //String [] foldernmaes = { "Calligraphy","Digital","Painting","Carricature"};
         ArrayList<String>  folderNames = new ArrayList<>();
         for (File file : selectFiles){
             uri =Uri.fromFile(file);
             folderNames.add( uri.getLastPathSegment() );
-
-
         }
-
-
 
        gridAdapter = new GridAdapter(this,folderNames);
         gridView.setAdapter(gridAdapter);
@@ -154,37 +102,19 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private ArrayList<File> SelectFiles() {
-
-
         ArrayList<File> mFiles = new ArrayList<File>();
         File mDirectory;
-
-
         String folderPath =   homeDirectoryPath;
         mDirectory = new File(folderPath);
-
-
         File[] files = mDirectory.listFiles();
-
-
         if(files == null) {
            return null;
         }
-
-
         for( File file : files ){
             if( file.isDirectory())
                 mFiles.add(file);
 
         }
-
         return  mFiles ;
-
-
     }
-
-
-
-
-
 }
