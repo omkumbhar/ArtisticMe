@@ -10,20 +10,22 @@ import android.widget.TextView;
 
 import com.code_crawler.artisticme.R;
 
+import java.util.ArrayList;
+
 public class GridAdapter extends BaseAdapter {
     Context context;
-    String [] folderNames;
+    ArrayList<String> folderNames;
     View view;
     LayoutInflater layoutInflater;
 
-    public GridAdapter(Context context, String[] folderNames) {
+    public GridAdapter(Context context, ArrayList<String>  folderNames) {
         this.context = context;
         this.folderNames = folderNames;
     }
 
     @Override
     public int getCount() {
-        return folderNames.length;
+        return folderNames.size();
     }
 
     @Override
@@ -45,7 +47,7 @@ public class GridAdapter extends BaseAdapter {
             view = layoutInflater.inflate(R.layout.grid_view,null);
             TextView fName = (TextView) view.findViewById(R.id.folderName);
 
-            fName.setText( folderNames[position] );
+            fName.setText( folderNames.get(position) );
         }
 
 

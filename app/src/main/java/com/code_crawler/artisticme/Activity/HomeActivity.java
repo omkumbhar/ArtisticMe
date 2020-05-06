@@ -8,6 +8,7 @@ import androidx.core.content.ContextCompat;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -22,6 +23,7 @@ import com.code_crawler.artisticme.R;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Objects;
 
 public class HomeActivity extends AppCompatActivity {
     String homeDirectoryPath ;
@@ -46,6 +48,11 @@ public class HomeActivity extends AppCompatActivity {
 
         if( permForWrite != PackageManager.PERMISSION_GRANTED && permForRead != PackageManager.PERMISSION_GRANTED ){
             requestPermission();
+        }
+        else{
+
+            loadFolders(Objects.requireNonNull(SelectFiles()));
+
         }
 
 
@@ -76,22 +83,22 @@ public class HomeActivity extends AppCompatActivity {
 
 
 
-        String [] foldernmaes = { "Calligraphy","Digital","Painting","Carricature"};
+        //String [] foldernmaes = { "Calligraphy","Digital","Painting","Carricature"};
 
-        ArrayList<File> folderPaths   = SelectFiles();
+        //ArrayList<File> folderPaths   = SelectFiles();
 
 
 
-        gridAdapter = new GridAdapter(this,foldernmaes);
+        //gridAdapter = new GridAdapter(this,foldernmaes);
+        //gridView.setAdapter(gridAdapter);
 
-        gridView.setAdapter(gridAdapter);
 
-        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(HomeActivity.this, "cliked "+ position, Toast.LENGTH_SHORT).show();
-            }
-        });
+
+
+
+
+
+
 
 
 
@@ -119,6 +126,27 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void loadFolders(ArrayList<File> selectFiles) {
+        Uri uri;
+        //String [] foldernmaes = { "Calligraphy","Digital","Painting","Carricature"};
+        ArrayList<String>  folderNames = new ArrayList<>();
+        for (File file : selectFiles){
+            uri =Uri.fromFile(file);
+            folderNames.add( uri.getLastPathSegment() );
+
+
+        }
+
+
+
+       gridAdapter = new GridAdapter(this,folderNames);
+        gridView.setAdapter(gridAdapter);
+
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(HomeActivity.this, "cliked "+ position, Toast.LENGTH_SHORT).show();
+            }
+        });
 
 
 
@@ -140,14 +168,15 @@ public class HomeActivity extends AppCompatActivity {
 
 
         if(files == null) {
-            Toast.makeText(this, "User are null", Toast.LENGTH_SHORT).show();
+           return null;
         }
 
-        if (files != null && files.length > 0) {
-            mFiles.addAll(Arrays.asList(files));
-        }
 
-        //Toast.makeText(this, "Alloted table : "+ files.length, Toast.LENGTH_SHORT).show();
+        for( File file : files ){
+            if( file.isDirectory())
+                mFiles.add(file);
+
+        }
 
         return  mFiles ;
 
