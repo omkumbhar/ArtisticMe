@@ -1,4 +1,4 @@
-package com.code_crawler.artisticme;
+package com.code_crawler.artisticme.Activity;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.widget.Toast;
 
+import com.code_crawler.artisticme.Activity.HomeActivity;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -63,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void launchActivity(FirebaseUser currentUser) {
-        Intent i = new Intent(this,HomeActivity.class);
+        Intent i = new Intent(this, HomeActivity.class);
         i.putExtra("name",currentUser.getDisplayName());
         i.putExtra("email",currentUser.getEmail());
         startActivity(i);
