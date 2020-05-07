@@ -1,11 +1,13 @@
 package com.code_crawler.artisticme.Activity;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -14,11 +16,14 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.code_crawler.artisticme.Adapter.GridAdapter;
 import com.code_crawler.artisticme.R;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -28,14 +33,31 @@ import java.util.Objects;
 public class HomeActivity extends AppCompatActivity {
     String homeDirectoryPath ;
     GridView gridView;
+    FloatingActionButton fab;
     GridAdapter gridAdapter;
+    String folderName;
     private static final int REQUEST_WRITE_PERMISSION = 2712;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-        homeDirectoryPath = Environment.getExternalStorageDirectory()+"/Artwork";
+
+        // Initialize view
         gridView = (GridView) findViewById(R.id.gridView);
+        fab = findViewById(R.id.fab);
+
+
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addFolderAlert();
+            }
+        });
+
+
+
+
+        homeDirectoryPath = Environment.getExternalStorageDirectory()+"/Artwork";
         Intent intent = getIntent();
         String name = intent.getStringExtra("name");
         String email = intent.getStringExtra("email");
@@ -58,6 +80,46 @@ public class HomeActivity extends AppCompatActivity {
 
 
     }
+
+    private void addFolderAlert() {
+
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(HomeActivity.this);
+        alertDialog.setTitle("Folder Add");
+        alertDialog.setMessage("Enter New folder name");
+
+        final EditText input = new EditText(HomeActivity.this);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT);
+        input.setLayoutParams(lp);
+        alertDialog.setView(input);
+        alertDialog.setIcon(R.drawable.ic_folder_black_24dp);
+
+        alertDialog.setPositiveButton("ADD",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        folderName = input.getText().toString().trim();
+                        if( !folderName.equals(""))
+                            Toast.makeText(HomeActivity.this, ""+folderName, Toast.LENGTH_SHORT).show();
+
+                        else
+                            Toast.makeText(HomeActivity.this, "Please enter valid folder name", Toast.LENGTH_SHORT).show();
+
+                    }
+                });
+
+        alertDialog.setNegativeButton("CANCEL",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+        alertDialog.show();
+
+    }
+
+
 
     private void requestPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)

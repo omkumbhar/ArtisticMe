@@ -7,6 +7,7 @@
     tools:context=".Activity.HomeActivity">
 
 
+
     <GridView
         android:id="@+id/gridView"
         android:numColumns="auto_fit"
@@ -15,15 +16,16 @@
         android:layout_height="match_parent"/>
 
 
-
-
-
-
-
-
-
-
-
-
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="184dp"
+        android:layout_height="169dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="30dp"
+        android:layout_marginEnd="30dp"
+        android:clickable="true"
+        app:maxImageSize="35dp"
+        app:srcCompat="@drawable/ic_add_black_24dp" />
 
 </RelativeLayout>
