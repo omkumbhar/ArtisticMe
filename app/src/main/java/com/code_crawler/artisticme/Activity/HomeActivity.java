@@ -22,6 +22,9 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.code_crawler.artisticme.Adapter.GridAdapter;
+import com.code_crawler.artisticme.Methods.CreateDirectory;
+import com.code_crawler.artisticme.Methods.LoadFiles;
+import com.code_crawler.artisticme.Methods.ReadWritePermissions;
 import com.code_crawler.artisticme.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -31,11 +34,14 @@ import java.util.Arrays;
 import java.util.Objects;
 
 public class HomeActivity extends AppCompatActivity {
-    String homeDirectoryPath ;
+
     GridView gridView;
     FloatingActionButton fab;
     GridAdapter gridAdapter;
-    String folderName;
+
+    // Classes declaration
+    CreateDirectory createDirectory;
+    LoadFiles loadFiles;
     private static final int REQUEST_WRITE_PERMISSION = 2712;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,18 +52,20 @@ public class HomeActivity extends AppCompatActivity {
         gridView = (GridView) findViewById(R.id.gridView);
         fab = findViewById(R.id.fab);
 
+        // Initialize class
+        createDirectory = new CreateDirectory(HomeActivity.this);
+        loadFiles       = new LoadFiles(HomeActivity.this);
+
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                addFolderAlert();
+                createDirectory.addFolderAlert();
+
             }
         });
 
 
-
-
-        homeDirectoryPath = Environment.getExternalStorageDirectory()+"/Artwork";
         Intent intent = getIntent();
         String name = intent.getStringExtra("name");
         String email = intent.getStringExtra("email");
@@ -65,7 +73,7 @@ public class HomeActivity extends AppCompatActivity {
 
 
         //Request Permission
-        int permForWrite = ContextCompat.checkSelfPermission( this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        /*int permForWrite = ContextCompat.checkSelfPermission( this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         int permForRead = ContextCompat.checkSelfPermission( this, Manifest.permission.READ_EXTERNAL_STORAGE);
 
         if( permForWrite != PackageManager.PERMISSION_GRANTED && permForRead != PackageManager.PERMISSION_GRANTED ){
@@ -73,53 +81,17 @@ public class HomeActivity extends AppCompatActivity {
         }
         else{
 
-            loadFolders(Objects.requireNonNull(SelectFiles()));
+            loadFolders(Objects.requireNonNull(   loadFiles .loadDirectories("Artwork")   ));
 
-        }
+        }*/
 
 
-
-    }
-
-    private void addFolderAlert() {
-
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(HomeActivity.this);
-        alertDialog.setTitle("Folder Add");
-        alertDialog.setMessage("Enter New folder name");
-
-        final EditText input = new EditText(HomeActivity.this);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT);
-        input.setLayoutParams(lp);
-        alertDialog.setView(input);
-        alertDialog.setIcon(R.drawable.ic_folder_black_24dp);
-
-        alertDialog.setPositiveButton("ADD",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        folderName = input.getText().toString().trim();
-                        if( !folderName.equals(""))
-                            Toast.makeText(HomeActivity.this, ""+folderName, Toast.LENGTH_SHORT).show();
-
-                        else
-                            Toast.makeText(HomeActivity.this, "Please enter valid folder name", Toast.LENGTH_SHORT).show();
-
-                    }
-                });
-
-        alertDialog.setNegativeButton("CANCEL",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
-
-        alertDialog.show();
+        if(ReadWritePermissions.isPermGranted(HomeActivity.this))
+            loadFolders(Objects.requireNonNull(   loadFiles .loadDirectories("Artwork")   ));
+        else
+            ReadWritePermissions.requestPermission(HomeActivity.this);
 
     }
-
-
 
     private void requestPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
@@ -136,7 +108,7 @@ public class HomeActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         if (requestCode == REQUEST_WRITE_PERMISSION && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            loadFolders(Objects.requireNonNull(SelectFiles()));
+            loadFolders(  loadFiles .loadDirectories("Artwork")      );
         }
     }
 
@@ -147,7 +119,6 @@ public class HomeActivity extends AppCompatActivity {
             uri =Uri.fromFile(file);
             folderNames.add( uri.getLastPathSegment() );
         }
-
        gridAdapter = new GridAdapter(this,folderNames);
         gridView.setAdapter(gridAdapter);
 
@@ -157,26 +128,7 @@ public class HomeActivity extends AppCompatActivity {
                 Toast.makeText(HomeActivity.this, "cliked "+ position, Toast.LENGTH_SHORT).show();
             }
         });
-
-
-
-
     }
 
-    private ArrayList<File> SelectFiles() {
-        ArrayList<File> mFiles = new ArrayList<File>();
-        File mDirectory;
-        String folderPath =   homeDirectoryPath;
-        mDirectory = new File(folderPath);
-        File[] files = mDirectory.listFiles();
-        if(files == null) {
-           return null;
-        }
-        for( File file : files ){
-            if( file.isDirectory())
-                mFiles.add(file);
 
-        }
-        return  mFiles ;
-    }
 }
