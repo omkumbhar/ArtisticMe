@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.code_crawler.artisticme.R;
@@ -18,7 +17,7 @@ public class GridAdapter extends BaseAdapter {
     View view;
     LayoutInflater layoutInflater;
 
-    public GridAdapter(Context context, ArrayList<String>  folderNames) {
+    public GridAdapter(Context context, ArrayList<String> folderNames) {
         this.context = context;
         this.folderNames = folderNames;
     }
@@ -30,7 +29,7 @@ public class GridAdapter extends BaseAdapter {
 
     @Override
     public Object getItem(int position) {
-        return null;
+        return folderNames.get(position);
     }
 
     @Override

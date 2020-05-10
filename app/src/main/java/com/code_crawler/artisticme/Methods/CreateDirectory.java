@@ -2,23 +2,34 @@ package com.code_crawler.artisticme.Methods;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.Environment;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 
+import com.code_crawler.artisticme.Adapter.RecyclerAdapter;
 import com.code_crawler.artisticme.R;
+
+import java.io.File;
 
 public class CreateDirectory {
     Context context;
     String folderName;
+    RecyclerAdapter adapter;
+    boolean result;
 
     public CreateDirectory(Context context) {
         this.context = context;
     }
 
-    public void addFolderAlert() {
+    public CreateDirectory(Context context, RecyclerAdapter adapter) {
+        this.context = context;
+        this.adapter = adapter;
+    }
+
+    public boolean addFolderAlert() {
 
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(this.context);
         alertDialog.setTitle("Folder Add");
@@ -37,12 +48,14 @@ public class CreateDirectory {
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         folderName = input.getText().toString().trim();
-                        if( !folderName.equals(""))
-                            Toast.makeText(context, ""+folderName, Toast.LENGTH_SHORT).show();
+                        if( !folderName.equals("")) {
+                            result = createDirectory();
+                        }
 
-                        else
+                        else {
+                            result = false;
                             Toast.makeText(context, "Please enter valid folder name", Toast.LENGTH_SHORT).show();
-
+                        }
                     }
                 });
 
@@ -54,7 +67,22 @@ public class CreateDirectory {
                 });
 
         alertDialog.show();
+        return result;
 
+    }
+
+
+
+
+
+    private boolean createDirectory() {
+        String DirectoryPath = Environment.getExternalStorageDirectory()+"/Artwork/"+folderName;
+        File dir = new File(DirectoryPath);
+        if( !dir.exists()) {
+            dir.mkdir();
+            return true;
+        }
+        return  false;
     }
 
 }
