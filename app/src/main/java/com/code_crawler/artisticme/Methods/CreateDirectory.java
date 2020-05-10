@@ -85,4 +85,9 @@ public class CreateDirectory {
         return  false;
     }
 
+
+    public boolean getResult(){
+        return this.result;
+    }
+
 }

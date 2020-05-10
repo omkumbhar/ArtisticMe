@@ -33,12 +33,15 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class HomeActivity extends AppCompatActivity {
     String folderName;
     FloatingActionButton fab;
-    CreateDirectory createDirectory;
-    private static final int REQUEST_WRITE_PERMISSION = 2712;
+
+    Fragment fragment  ;
+    FragmentManager fragmentManager  ;
+    FragmentTransaction ft  ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +57,7 @@ public class HomeActivity extends AppCompatActivity {
 
         //Toast.makeText(this, name +" has this email "+ email, Toast.LENGTH_SHORT).show();
 
-        createDirectory = new CreateDirectory(HomeActivity.this);
+
 
 
         loadFragment();
@@ -62,63 +65,23 @@ public class HomeActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                addFolderAlert();
 
-              if( createDirectory.addFolderAlert())
-                   loadFragment();
             }
 
         });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     }
-    private void loadFragment() {
-        Fragment fragment                           = new HomeFragment();
-        FragmentManager fragmentManager             = getSupportFragmentManager();
-        FragmentTransaction ft                      = fragmentManager.beginTransaction();
 
+
+    private void loadFragment() {
+        fragment                           = new HomeFragment();
+        fragmentManager             = getSupportFragmentManager();
+        ft                      = fragmentManager.beginTransaction();
         ft.replace(R.id.container,fragment);
         ft.commit();
     }
-    public static  void requestPermission(Activity context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-            ActivityCompat.requestPermissions(context,
-                    new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-                            , Manifest.permission.READ_EXTERNAL_STORAGE},REQUEST_WRITE_PERMISSION );
 
-
-
-    }
 
 
     @Override
@@ -146,9 +109,11 @@ public class HomeActivity extends AppCompatActivity {
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         folderName = input.getText().toString().trim();
-                        if( !folderName.equals(""))
-                            Toast.makeText(HomeActivity.this, ""+folderName, Toast.LENGTH_SHORT).show();
+                        if( !folderName.equals("")) {
+                            createDirectory();
+                            loadFragment();
 
+                        }
                         else
                             Toast.makeText(HomeActivity.this, "Please enter valid folder name", Toast.LENGTH_SHORT).show();
 
@@ -164,6 +129,15 @@ public class HomeActivity extends AppCompatActivity {
 
         alertDialog.show();
 
+    }
+    private boolean createDirectory() {
+        String DirectoryPath = Environment.getExternalStorageDirectory()+"/Artwork/"+folderName;
+        File dir = new File(DirectoryPath);
+        if( !dir.exists()) {
+            dir.mkdir();
+            return true;
+        }
+        return  false;
     }
 
 
