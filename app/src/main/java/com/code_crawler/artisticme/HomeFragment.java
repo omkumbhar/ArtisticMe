@@ -42,7 +42,7 @@ import java.util.Objects;
  * Use the {@link HomeFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickListener{
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -136,6 +136,7 @@ public class HomeFragment extends Fragment {
 
         recyView.setLayoutManager(new GridLayoutManager(getContext(),3));
         adapter = new RecyclerAdapter(getContext(),folderNames);
+        adapter.setClickListener(this);
         recyView.setAdapter(adapter);
 
 
@@ -162,6 +163,11 @@ public class HomeFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onItemClick(View view, int position) {
+        Toast.makeText(getContext(), ""+ adapter.getItem(position), Toast.LENGTH_SHORT).show();
     }
 
     /**

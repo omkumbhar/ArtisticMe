@@ -19,7 +19,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
 
     Context context;
     ArrayList<String> folderNames;
-    View view;
+    private ItemClickListener mClickListener;
 
     public RecyclerAdapter(Context context, ArrayList<String> folderNames) {
         this.context = context;
@@ -53,14 +53,30 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
         return folderNames.size();
     }
 
-    public class MyViewHolder extends RecyclerView.ViewHolder  {
+    public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView txtView;
 
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
-
             txtView = (TextView) itemView.findViewById(R.id.folderName);
+            itemView.setOnClickListener(this);
         }
+
+        @Override
+        public void onClick(View v) {
+            if (mClickListener != null) mClickListener.onItemClick(v, getAdapterPosition());
+        }
+
+    }
+    public String getItem(int id) {
+        return folderNames.get(id);
+    }
+    public void setClickListener(ItemClickListener itemClickListener) {
+        this.mClickListener = itemClickListener;
+    }
+
+    public interface ItemClickListener {
+        void onItemClick(View view, int position);
     }
 }

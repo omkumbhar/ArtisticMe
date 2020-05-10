@@ -26,6 +26,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.code_crawler.artisticme.Adapter.GridAdapter;
+import com.code_crawler.artisticme.Adapter.RecyclerAdapter;
 import com.code_crawler.artisticme.HomeFragment;
 import com.code_crawler.artisticme.Methods.CreateDirectory;
 import com.code_crawler.artisticme.R;
@@ -35,10 +36,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class HomeActivity extends AppCompatActivity {
+public class HomeActivity extends AppCompatActivity   {
     String folderName;
     FloatingActionButton fab;
-
     Fragment fragment  ;
     FragmentManager fragmentManager  ;
     FragmentTransaction ft  ;
@@ -60,7 +60,7 @@ public class HomeActivity extends AppCompatActivity {
 
 
 
-        loadFragment();
+
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -73,6 +73,11 @@ public class HomeActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadFragment();
+    }
 
     private void loadFragment() {
         fragment                           = new HomeFragment();
