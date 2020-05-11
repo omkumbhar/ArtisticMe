@@ -8,6 +8,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,9 +17,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
+import android.widget.Toast;
 
 import com.code_crawler.artisticme.Adapter.RecyclerAdapter;
-import com.code_crawler.artisticme.Activity.AlbumActivity;
+import com.code_crawler.artisticme.AlbumFragment;
 import com.code_crawler.artisticme.Methods.LoadFiles;
 import com.code_crawler.artisticme.Methods.PermissionsRequest;
 import com.code_crawler.artisticme.R;
@@ -92,7 +94,7 @@ public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickL
 
 
 
-        getActivity();
+
 
 
         return inflater.inflate(R.layout.fragment_home, container, false);
@@ -107,6 +109,7 @@ public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickL
 
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), GridView.AUTO_FIT,
                 LinearLayoutManager.HORIZONTAL,false);
+
         recyView = view.findViewById(R.id.recyView);
         recyView.setLayoutManager(new GridLayoutManager(getContext(),3));
 
@@ -161,13 +164,23 @@ public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickL
 
     @Override
     public void onItemClick(View view, int position) {
-        //Toast.makeText(getContext(), ""+ adapter.getItem(position), Toast.LENGTH_SHORT).show();
+       //Toast.makeText(getContext(), ""+ adapter.getItem(position), Toast.LENGTH_SHORT).show();
+
+        Bundle args = new Bundle();
+        args.putString("folderName",adapter.getItem(position));
+
+        AlbumFragment alFrag = new AlbumFragment();
+        alFrag.setArguments(args);
 
 
+        FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.container, alFrag,"AlbumFrag");
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
 
-        Intent intent = new Intent(getActivity(), AlbumActivity.class);
+        /*Intent intent = new Intent(getActivity(), AlbumActivity.class);
         intent.putExtra("folderName",adapter.getItem(position));
-        startActivity(intent);
+        startActivity(intent);*/
     }
 
     /**

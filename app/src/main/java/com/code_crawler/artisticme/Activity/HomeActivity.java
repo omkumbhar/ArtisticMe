@@ -28,6 +28,7 @@ public class HomeActivity extends AppCompatActivity   {
     Fragment fragment  ;
     FragmentManager fragmentManager  ;
     FragmentTransaction ft  ;
+    Fragment currentFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +55,11 @@ public class HomeActivity extends AppCompatActivity   {
                 HomeActivity.this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        addFolderAlert();
+                        if( getCurrentFragmentTag().equals("HomeFrag"))
+                            addFolderAlert();
+                        else
+                        Toast.makeText(HomeActivity.this, ""+getCurrentFragmentTag(), Toast.LENGTH_SHORT).show();
+
                     }
                 });
 
@@ -67,7 +72,12 @@ public class HomeActivity extends AppCompatActivity   {
         });
 
     }
-
+    private String getCurrentFragmentTag() {
+        FragmentManager fragmentManager = this.getSupportFragmentManager();
+        int stackCount = fragmentManager.getBackStackEntryCount();
+        fragmentManager.getFragments();
+        return fragmentManager.getFragments().get( stackCount > 0 ? stackCount-1 : stackCount ).getTag();
+    }
     @Override
     protected void onResume() {
         super.onResume();
@@ -87,7 +97,7 @@ public class HomeActivity extends AppCompatActivity   {
         fragment                           = new HomeFragment();
         fragmentManager             = getSupportFragmentManager();
         ft                      = fragmentManager.beginTransaction();
-        ft.replace(R.id.container,fragment);
+        ft.replace(R.id.container,fragment,"HomeFrag");
         ft.commit();
     }
 
