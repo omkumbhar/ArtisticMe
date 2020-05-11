@@ -1,10 +1,12 @@
-package com.code_crawler.artisticme;
+package com.code_crawler.artisticme.Activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
+
+import com.code_crawler.artisticme.R;
 
 public class AlbumActivity extends AppCompatActivity {
 

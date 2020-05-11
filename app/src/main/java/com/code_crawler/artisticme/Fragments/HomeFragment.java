@@ -16,10 +16,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
-import android.widget.Toast;
 
 import com.code_crawler.artisticme.Adapter.RecyclerAdapter;
-import com.code_crawler.artisticme.AlbumActivity;
+import com.code_crawler.artisticme.Activity.AlbumActivity;
 import com.code_crawler.artisticme.Methods.LoadFiles;
 import com.code_crawler.artisticme.Methods.PermissionsRequest;
 import com.code_crawler.artisticme.R;
@@ -114,7 +113,7 @@ public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickL
 
 
         if(PermissionsRequest.isPermGranted(getContext()))
-            loadFolders(Objects.requireNonNull(   loadFiles .loadDirectories("Artwork")   ));
+            loadFolders(Objects.requireNonNull(   loadFiles .loadDirectories()   ));
         else
             PermissionsRequest.requestPermission(getActivity());
 
@@ -141,7 +140,7 @@ public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickL
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_WRITE_PERMISSION && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            loadFolders(Objects.requireNonNull(   loadFiles .loadDirectories("Artwork")   ));
+            loadFolders(Objects.requireNonNull(   loadFiles .loadDirectories()   ));
         }
 
     }

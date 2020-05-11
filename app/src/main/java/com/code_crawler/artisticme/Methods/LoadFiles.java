@@ -7,21 +7,22 @@ import java.io.File;
 import java.util.ArrayList;
 
 public class LoadFiles {
-    Context context;
-    String directoryPath = Environment.getExternalStorageDirectory()+"/";
+    private Context context;
+    private static String directoryPath = Environment.getExternalStorageDirectory()+"/Artwork";
 
 
     public LoadFiles(Context context) {
         this.context = context;
     }
 
-    public ArrayList<File> loadDirectories(String folderName){
-        directoryPath+=folderName;
+    public ArrayList<File> loadDirectories(){
+
         ArrayList<File> mFiles = new ArrayList<File>();
         File mDirectory;
         String folderPath =   directoryPath;
         mDirectory = new File(folderPath);
         File[] files = mDirectory.listFiles();
+
         if(files == null) {
             return null;
         }
@@ -32,6 +33,31 @@ public class LoadFiles {
         return  mFiles ;
     }
 
+
+
+
+
+    public static  ArrayList<File> loadImages(String folderName){
+        String albumPath = directoryPath+ "/" +folderName;
+
+        ArrayList<File> images = new ArrayList<File>();
+        File mDirectory = new File(albumPath);
+        File[] files = mDirectory.listFiles();
+
+
+        if(files == null) {
+            return null;
+        }
+        for( File file : files ){
+            if( !file.isDirectory())
+                images .add(file);
+        }
+        return  images;
+
+
+
+
+    }
 
 
 }

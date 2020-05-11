@@ -12,7 +12,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".AlbumActivity"/>
+        <activity android:name=".Activity.AlbumActivity"/>
         <activity android:name=".Activity.HomeActivity" />
         <activity android:name=".Activity.MainActivity">
             <intent-filter>
