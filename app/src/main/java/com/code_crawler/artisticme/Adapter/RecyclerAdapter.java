@@ -4,9 +4,8 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
+
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -17,8 +16,8 @@ import java.util.ArrayList;
 
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyViewHolder>{
 
-    Context context;
-    ArrayList<String> folderNames;
+    private Context context;
+    private ArrayList<String> folderNames;
     private ItemClickListener mClickListener;
 
     public RecyclerAdapter(Context context, ArrayList<String> folderNames) {
@@ -32,20 +31,13 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
     public RecyclerAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.grid_view,parent,false);
 
-        MyViewHolder myViewHolder = new MyViewHolder(view);
-
-
-
-        return myViewHolder;
+        return new MyViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerAdapter.MyViewHolder holder, final int position) {
 
         holder.txtView.setText(folderNames.get(position));
-
-
-
     }
 
     @Override
@@ -56,10 +48,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
     public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView txtView;
 
-
-        public MyViewHolder(@NonNull View itemView) {
+        MyViewHolder(@NonNull View itemView) {
             super(itemView);
-            txtView = (TextView) itemView.findViewById(R.id.folderName);
+            txtView =  itemView.findViewById(R.id.folderName);
             itemView.setOnClickListener(this);
         }
 

@@ -3,38 +3,24 @@ package com.code_crawler.artisticme.Activity;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import android.Manifest;
-import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.EditText;
-import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.code_crawler.artisticme.Adapter.GridAdapter;
-import com.code_crawler.artisticme.Adapter.RecyclerAdapter;
-import com.code_crawler.artisticme.HomeFragment;
-import com.code_crawler.artisticme.Methods.CreateDirectory;
+import com.code_crawler.artisticme.Fragments.HomeFragment;
 import com.code_crawler.artisticme.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Objects;
 
 public class HomeActivity extends AppCompatActivity   {
     String folderName;
@@ -65,7 +51,16 @@ public class HomeActivity extends AppCompatActivity   {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                addFolderAlert();
+                HomeActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        addFolderAlert();
+                    }
+                });
+
+
+
+
 
             }
 
@@ -76,7 +71,16 @@ public class HomeActivity extends AppCompatActivity   {
     @Override
     protected void onResume() {
         super.onResume();
-        loadFragment();
+
+        HomeActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                loadFragment();
+            }
+        });
+
+
+
     }
 
     private void loadFragment() {
@@ -135,14 +139,11 @@ public class HomeActivity extends AppCompatActivity   {
         alertDialog.show();
 
     }
-    private boolean createDirectory() {
+    private void createDirectory() {
         String DirectoryPath = Environment.getExternalStorageDirectory()+"/Artwork/"+folderName;
         File dir = new File(DirectoryPath);
-        if( !dir.exists()) {
+        if( !dir.exists())
             dir.mkdir();
-            return true;
-        }
-        return  false;
     }
 
 

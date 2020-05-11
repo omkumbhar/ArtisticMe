@@ -1,33 +1,28 @@
-package com.code_crawler.artisticme;
+package com.code_crawler.artisticme.Fragments;
 
-import android.Manifest;
-import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
 
-import com.code_crawler.artisticme.Activity.HomeActivity;
-import com.code_crawler.artisticme.Adapter.GridAdapter;
 import com.code_crawler.artisticme.Adapter.RecyclerAdapter;
+import com.code_crawler.artisticme.AlbumActivity;
 import com.code_crawler.artisticme.Methods.LoadFiles;
 import com.code_crawler.artisticme.Methods.PermissionsRequest;
+import com.code_crawler.artisticme.R;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -52,9 +47,9 @@ public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickL
     private String mParam1;
     private String mParam2;
     private static final int REQUEST_WRITE_PERMISSION = 2712;
-    RecyclerView recyView;
-    RecyclerAdapter adapter;
-    LoadFiles loadFiles;
+    private RecyclerView recyView;
+    private RecyclerAdapter adapter;
+    private LoadFiles loadFiles;
 
 
 
@@ -167,7 +162,13 @@ public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickL
 
     @Override
     public void onItemClick(View view, int position) {
-        Toast.makeText(getContext(), ""+ adapter.getItem(position), Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getContext(), ""+ adapter.getItem(position), Toast.LENGTH_SHORT).show();
+
+
+
+        Intent intent = new Intent(getActivity(), AlbumActivity.class);
+        intent.putExtra("folderName",adapter.getItem(position));
+        startActivity(intent);
     }
 
     /**
