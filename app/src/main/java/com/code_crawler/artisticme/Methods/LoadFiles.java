@@ -53,10 +53,6 @@ public class LoadFiles {
                 images .add(file);
         }
         return  images;
-
-
-
-
     }
 
 

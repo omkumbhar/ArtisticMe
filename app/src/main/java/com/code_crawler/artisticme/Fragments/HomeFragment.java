@@ -1,6 +1,5 @@
 package com.code_crawler.artisticme.Fragments;
 
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -17,10 +16,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
-import android.widget.Toast;
 
 import com.code_crawler.artisticme.Adapter.RecyclerAdapter;
-import com.code_crawler.artisticme.AlbumFragment;
 import com.code_crawler.artisticme.Methods.LoadFiles;
 import com.code_crawler.artisticme.Methods.PermissionsRequest;
 import com.code_crawler.artisticme.R;
@@ -131,7 +128,7 @@ public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickL
         }
 
 
-        recyView.setLayoutManager(new GridLayoutManager(getContext(),3));
+        //recyView.setLayoutManager(new GridLayoutManager(getContext(),3));
         adapter = new RecyclerAdapter(getContext(),folderNames);
         adapter.setClickListener(this);
         recyView.setAdapter(adapter);

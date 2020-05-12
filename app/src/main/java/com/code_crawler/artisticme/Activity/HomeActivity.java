@@ -16,6 +16,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.code_crawler.artisticme.Fragments.AlbumFragment;
 import com.code_crawler.artisticme.Fragments.HomeFragment;
 import com.code_crawler.artisticme.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -47,7 +48,12 @@ public class HomeActivity extends AppCompatActivity   {
 
 
 
-
+        HomeActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                loadFragment();
+            }
+        });
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,9 +63,10 @@ public class HomeActivity extends AppCompatActivity   {
                     public void run() {
                         if( getCurrentFragmentTag().equals("HomeFrag"))
                             addFolderAlert();
-                        else
-                        Toast.makeText(HomeActivity.this, ""+getCurrentFragmentTag(), Toast.LENGTH_SHORT).show();
+                        else  {
 
+                            Toast.makeText(HomeActivity.this, "" + AlbumFragment.folderName, Toast.LENGTH_SHORT).show();
+                        }
                     }
                 });
 
@@ -82,12 +89,7 @@ public class HomeActivity extends AppCompatActivity   {
     protected void onResume() {
         super.onResume();
 
-        HomeActivity.this.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                loadFragment();
-            }
-        });
+
 
 
 

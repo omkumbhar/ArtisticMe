@@ -1,18 +1,28 @@
-package com.code_crawler.artisticme;
+package com.code_crawler.artisticme.Fragments;
 
-import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+
+import com.code_crawler.artisticme.Adapter.AlbumAdapter;
+import com.code_crawler.artisticme.Adapter.RecyclerAdapter;
+import com.code_crawler.artisticme.Methods.LoadFiles;
+import com.code_crawler.artisticme.Methods.PermissionsRequest;
+import com.code_crawler.artisticme.R;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Objects;
 
 
 public class AlbumFragment extends Fragment {
@@ -21,6 +31,8 @@ public class AlbumFragment extends Fragment {
     private static final String ARG_PARAM2 = "param2";
 
     RecyclerView imageRecycler;
+    public static String folderName;
+    AlbumAdapter albumAdapter;
 
 
 
@@ -66,9 +78,9 @@ public class AlbumFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
 
-        String folderName = getArguments().getString("folderName");
 
-        Toast.makeText(getContext(), ""+ folderName, Toast.LENGTH_SHORT).show();
+        folderName = getArguments().getString("folderName");
+
         return inflater.inflate(R.layout.fragment_album, container, false);
     }
 
@@ -78,6 +90,30 @@ public class AlbumFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         imageRecycler = view.findViewById(R.id.imageRecycler);
+        imageRecycler.setLayoutManager(new GridLayoutManager(getContext(),4));
+
+
+        if(PermissionsRequest.isPermGranted(getContext()))
+            loadImages(Objects.requireNonNull(   LoadFiles.loadImages(folderName)   ));
+        else
+            PermissionsRequest.requestPermission(getActivity());
+
+
+    }
+
+    private void loadImages(final ArrayList<File> imagePaths) {
+
+
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if( imagePaths != null  ){
+                    albumAdapter = new AlbumAdapter(getContext(),imagePaths);
+                    imageRecycler.setAdapter(albumAdapter);
+                }
+            }
+        });
+
 
 
 
