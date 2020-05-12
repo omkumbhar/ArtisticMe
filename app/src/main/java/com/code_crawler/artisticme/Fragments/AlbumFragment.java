@@ -30,9 +30,9 @@ public class AlbumFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    RecyclerView imageRecycler;
+    private RecyclerView imageRecycler;
     public static String folderName;
-    AlbumAdapter albumAdapter;
+    private AlbumAdapter albumAdapter;
 
 
 
@@ -79,6 +79,7 @@ public class AlbumFragment extends Fragment {
         // Inflate the layout for this fragment
 
 
+        assert getArguments() != null;
         folderName = getArguments().getString("folderName");
 
         return inflater.inflate(R.layout.fragment_album, container, false);
@@ -90,32 +91,47 @@ public class AlbumFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         imageRecycler = view.findViewById(R.id.imageRecycler);
-        imageRecycler.setLayoutManager(new GridLayoutManager(getContext(),4));
-
-
-        if(PermissionsRequest.isPermGranted(getContext()))
-            loadImages(Objects.requireNonNull(   LoadFiles.loadImages(folderName)   ));
-        else
-            PermissionsRequest.requestPermission(getActivity());
-
-
-    }
-
-    private void loadImages(final ArrayList<File> imagePaths) {
-
-
-        getActivity().runOnUiThread(new Runnable() {
+        Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if( imagePaths != null  ){
-                    albumAdapter = new AlbumAdapter(getContext(),imagePaths);
-                    imageRecycler.setAdapter(albumAdapter);
-                }
+                imageRecycler.setLayoutManager(new GridLayoutManager(getContext(),4));
+                if(PermissionsRequest.isPermGranted(getContext()))
+                    loadImages(Objects.requireNonNull(   LoadFiles.loadImages(folderName)   ));
+                else
+                    PermissionsRequest.requestPermission(getActivity());
             }
         });
 
 
 
+
+    }
+
+    private void loadImages(ArrayList<File> imagePaths) {
+
+        if( imagePaths != null  ){
+            albumAdapter = new AlbumAdapter(getContext(),imagePaths);
+            imageRecycler.setAdapter(albumAdapter);
+        }
+
+
+
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if(PermissionsRequest.isPermGranted(getContext()))
+                    loadImages(Objects.requireNonNull(   LoadFiles.loadImages(folderName)   ));
+                else
+                    PermissionsRequest.requestPermission(getActivity());
+            }
+        });
 
     }
 
