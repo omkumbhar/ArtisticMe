@@ -175,9 +175,6 @@ public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickL
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
 
-        /*Intent intent = new Intent(getActivity(), AlbumActivity.class);
-        intent.putExtra("folderName",adapter.getItem(position));
-        startActivity(intent);*/
     }
 
     /**

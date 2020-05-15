@@ -114,9 +114,6 @@ public class AlbumFragment extends Fragment {
             imageRecycler.setAdapter(albumAdapter);
         }
 
-
-
-
     }
 
     @Override
