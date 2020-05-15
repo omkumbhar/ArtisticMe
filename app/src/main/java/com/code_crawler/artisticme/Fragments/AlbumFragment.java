@@ -1,11 +1,14 @@
 package com.code_crawler.artisticme.Fragments;
 
+import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -14,18 +17,26 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.code_crawler.artisticme.Activity.HomeActivity;
 import com.code_crawler.artisticme.Adapter.AlbumAdapter;
 import com.code_crawler.artisticme.Adapter.RecyclerAdapter;
+import com.code_crawler.artisticme.Methods.CreateDirectory;
 import com.code_crawler.artisticme.Methods.LoadFiles;
 import com.code_crawler.artisticme.Methods.PermissionsRequest;
+import com.code_crawler.artisticme.PhotoViewFragment;
 import com.code_crawler.artisticme.R;
+import com.zhihu.matisse.Matisse;
+import com.zhihu.matisse.MimeType;
+import com.zhihu.matisse.engine.impl.GlideEngine;
 
 import java.io.File;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 
-public class AlbumFragment extends Fragment {
+public class AlbumFragment extends Fragment implements AlbumAdapter.ItemClickListener {
 
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -33,6 +44,8 @@ public class AlbumFragment extends Fragment {
     private RecyclerView imageRecycler;
     public static String folderName;
     private AlbumAdapter albumAdapter;
+    final int REQUEST_CODE_CHOOSE = 9999;
+    List<Uri> mSelected;
 
 
 
@@ -82,13 +95,29 @@ public class AlbumFragment extends Fragment {
         assert getArguments() != null;
         folderName = getArguments().getString("folderName");
 
+
         return inflater.inflate(R.layout.fragment_album, container, false);
     }
 
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        ((HomeActivity)getActivity()).getFab().setVisibility(View.VISIBLE);
         super.onViewCreated(view, savedInstanceState);
+
+
+        ((HomeActivity) Objects.requireNonNull(getActivity())).getFab()
+                .setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        filePicker();
+                    }
+                });
+
+
+
+
+
 
         imageRecycler = view.findViewById(R.id.imageRecycler);
         Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
@@ -96,7 +125,7 @@ public class AlbumFragment extends Fragment {
             public void run() {
                 imageRecycler.setLayoutManager(new GridLayoutManager(getContext(),4));
                 if(PermissionsRequest.isPermGranted(getContext()))
-                    loadImages(Objects.requireNonNull(   LoadFiles.loadImages(folderName)   ));
+                    loadImagesInView(Objects.requireNonNull(   LoadFiles.loadImages(folderName)   ));
                 else
                     PermissionsRequest.requestPermission(getActivity());
             }
@@ -107,10 +136,36 @@ public class AlbumFragment extends Fragment {
 
     }
 
-    private void loadImages(ArrayList<File> imagePaths) {
+
+    private void filePicker() {
+        Matisse.from(getActivity())
+                .choose(MimeType.ofAll())
+                .countable(true)
+                .maxSelectable(10)
+                .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
+                .thumbnailScale(0.85f)
+                .imageEngine(new GlideEngine())
+                .forResult(REQUEST_CODE_CHOOSE );
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_CHOOSE && resultCode == -1) {
+            mSelected = Matisse.obtainResult(data);
+            try {
+                CreateDirectory.moveFiles(mSelected,AlbumFragment.folderName,getContext());
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void loadImagesInView(ArrayList<File> imagePaths) {
 
         if( imagePaths != null  ){
             albumAdapter = new AlbumAdapter(getContext(),imagePaths);
+            albumAdapter.setClickListener(this);
             imageRecycler.setAdapter(albumAdapter);
         }
 
@@ -124,13 +179,14 @@ public class AlbumFragment extends Fragment {
             @Override
             public void run() {
                 if(PermissionsRequest.isPermGranted(getContext()))
-                    loadImages(Objects.requireNonNull(   LoadFiles.loadImages(folderName)   ));
+                    loadImagesInView(Objects.requireNonNull(   LoadFiles.loadImages(folderName)   ));
                 else
                     PermissionsRequest.requestPermission(getActivity());
             }
         });
 
     }
+
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
@@ -139,21 +195,35 @@ public class AlbumFragment extends Fragment {
         }
     }
 
-    /*@Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }*/
+
 
     @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onItemClick(View view, int position) {
+       // Toast.makeText(getContext(), position+"   "+ albumAdapter.getItem(position), Toast.LENGTH_SHORT).show();
+
+
+        Bundle args = new Bundle();
+        args.putString("folderName",folderName);
+        args.putInt("Position",position);
+
+        PhotoViewFragment phFragmet = new PhotoViewFragment();
+        phFragmet.setArguments(args);
+
+
+        FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.container, phFragmet,"PhotoFrag");
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
+
+
+
+
     }
 
     /**

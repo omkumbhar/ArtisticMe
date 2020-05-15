@@ -18,7 +18,7 @@ import java.util.ArrayList;
 public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.MyViewHolder> {
     private Context context;
     private ArrayList<File> imagePaths;
-    private RecyclerAdapter.ItemClickListener mClickListener;
+    private ItemClickListener mClickListener;
 
     public AlbumAdapter(Context context, ArrayList<File> imagePaths) {
         this.context = context;
@@ -47,15 +47,31 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.MyViewHolder
         return imagePaths.size();
     }
 
-    public class MyViewHolder extends RecyclerView.ViewHolder {
+    public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         ImageView imageView;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
+
             imageView = itemView.findViewById(R.id.albumImage);
-
-
+            itemView.setOnClickListener(this);
         }
 
+
+        @Override
+        public void onClick(View v) {
+            if (mClickListener != null) mClickListener.onItemClick(v, getAdapterPosition());
+        }
+    }
+    public String getItem(int id) {
+        return imagePaths.get(id).toString();
+    }
+    public void setClickListener(ItemClickListener itemClickListener) {
+        this.mClickListener = itemClickListener;
+    }
+
+
+    public interface ItemClickListener {
+        void onItemClick(View view, int position);
     }
 }

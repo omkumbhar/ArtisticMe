@@ -34,7 +34,7 @@ import java.net.URISyntaxException;
 import java.util.List;
 
 public class HomeActivity extends AppCompatActivity   {
-    String folderName;
+
     FloatingActionButton fab;
     Fragment fragment  ;
     FragmentManager fragmentManager  ;
@@ -47,10 +47,9 @@ public class HomeActivity extends AppCompatActivity   {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         fab                         =  findViewById(R.id.fab);
-        Intent intent       = getIntent();
-        String name         = intent.getStringExtra("name");
-        String email        = intent.getStringExtra("email");
-        //Toast.makeText(this, name +" has this email "+ email, Toast.LENGTH_SHORT).show();
+        Intent intent               = getIntent();
+        String name                 = intent.getStringExtra("name");
+        String email                = intent.getStringExtra("email");
         HomeActivity.this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -58,36 +57,11 @@ public class HomeActivity extends AppCompatActivity   {
             }
         });
 
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                HomeActivity.this.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if( getCurrentFragmentTag().equals("HomeFrag"))
-                            addFolderAlert();
-                        else  {
-                            filePicker();
-                            Toast.makeText(HomeActivity.this, "" + AlbumFragment.folderName, Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-            }
-
-        });
-
+    }
+    public  FloatingActionButton getFab(){
+        return fab;
     }
 
-    private void filePicker() {
-        Matisse.from(HomeActivity.this)
-                .choose(MimeType.ofAll())
-                .countable(true)
-                .maxSelectable(10)
-                .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
-                .thumbnailScale(0.85f)
-                .imageEngine(new GlideEngine())
-                .forResult(REQUEST_CODE_CHOOSE );
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -102,33 +76,10 @@ public class HomeActivity extends AppCompatActivity   {
         }
     }
 
-    private void moveFiles(List<Uri> mSelected) {
-        for (Uri uri :  mSelected){
-
-            String filePath = null;
-            try {
-                filePath = PathUtil.getPath(HomeActivity.this,uri );
-            } catch (URISyntaxException e) {
-                e.printStackTrace();
-            }
-
-            Toast.makeText(this, ""+ filePath , Toast.LENGTH_SHORT).show();
-        }
-
-    }
-
-
-    private String getCurrentFragmentTag() {
-        FragmentManager fragmentManager = this.getSupportFragmentManager();
-        int stackCount = fragmentManager.getBackStackEntryCount();
-        fragmentManager.getFragments();
-        return fragmentManager.getFragments().get( stackCount > 0 ? stackCount-1 : stackCount ).getTag();
-    }
-
     private void loadFragment() {
         fragment                           = new HomeFragment();
-        fragmentManager             = getSupportFragmentManager();
-        ft                      = fragmentManager.beginTransaction();
+        fragmentManager                    = getSupportFragmentManager();
+        ft                                 = fragmentManager.beginTransaction();
         ft.replace(R.id.container,fragment,"HomeFrag");
         ft.commit();
     }
@@ -138,47 +89,6 @@ public class HomeActivity extends AppCompatActivity   {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    public void addFolderAlert() {
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(HomeActivity.this);
-        alertDialog.setTitle("Folder Add");
-        alertDialog.setMessage("Enter New folder name");
 
-        final EditText input = new EditText(HomeActivity.this);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT);
-        input.setLayoutParams(lp);
-        input.setHint("Enter Name");
-        alertDialog.setView(input);
-        alertDialog.setIcon(R.drawable.ic_folder_black_24dp);
-        alertDialog.setPositiveButton("CREATE",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        folderName = input.getText().toString().trim();
-                        if( !folderName.equals("")) {
-                            createDirectory();
-                            loadFragment();
-                        }
-                        else
-                            Toast.makeText(HomeActivity.this, "Please enter valid folder name", Toast.LENGTH_SHORT).show();
-
-                    }
-                });
-
-        alertDialog.setNegativeButton("CANCEL",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
-
-        alertDialog.show();
-    }
-    private void createDirectory() {
-        String DirectoryPath = Environment.getExternalStorageDirectory()+"/Artwork/"+folderName;
-        File dir = new File(DirectoryPath);
-        if( !dir.exists())
-            dir.mkdir();
-    }
 
 }

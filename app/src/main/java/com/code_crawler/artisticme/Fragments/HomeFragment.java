@@ -1,22 +1,30 @@
 package com.code_crawler.artisticme.Fragments;
 
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.LinearLayout;
+import android.widget.Toast;
 
+import com.code_crawler.artisticme.Activity.HomeActivity;
 import com.code_crawler.artisticme.Adapter.RecyclerAdapter;
 import com.code_crawler.artisticme.Methods.LoadFiles;
 import com.code_crawler.artisticme.Methods.PermissionsRequest;
@@ -48,6 +56,7 @@ public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickL
     private RecyclerView recyView;
     private RecyclerAdapter adapter;
     private LoadFiles loadFiles;
+    String folderName;
 
 
 
@@ -104,8 +113,15 @@ public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickL
 
         loadFiles = new LoadFiles(getContext());
 
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), GridView.AUTO_FIT,
-                LinearLayoutManager.HORIZONTAL,false);
+        //Giving on click to FAB
+        ((HomeActivity) Objects.requireNonNull(getActivity())).getFab()
+                .setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addFolderAlert();
+            }
+        });
+
 
         recyView = view.findViewById(R.id.recyView);
         recyView.setLayoutManager(new GridLayoutManager(getContext(),3));
@@ -127,8 +143,6 @@ public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickL
             folderNames.add( uri.getLastPathSegment() );
         }
 
-
-        //recyView.setLayoutManager(new GridLayoutManager(getContext(),3));
         adapter = new RecyclerAdapter(getContext(),folderNames);
         adapter.setClickListener(this);
         recyView.setAdapter(adapter);
@@ -144,37 +158,29 @@ public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickL
         }
 
     }
-
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
         }
     }
-
-
     @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
     }
-
     @Override
     public void onItemClick(View view, int position) {
-       //Toast.makeText(getContext(), ""+ adapter.getItem(position), Toast.LENGTH_SHORT).show();
-
+       Toast.makeText(getContext(), ""+ adapter.getItem(position), Toast.LENGTH_SHORT).show();
         Bundle args = new Bundle();
         args.putString("folderName",adapter.getItem(position));
-
         AlbumFragment alFrag = new AlbumFragment();
         alFrag.setArguments(args);
-
-
         FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+        getActivity().getSupportFragmentManager().popBackStack();
         fragmentTransaction.replace(R.id.container, alFrag,"AlbumFrag");
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
-
     }
 
     /**
@@ -191,4 +197,57 @@ public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickL
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
+
+    public void addFolderAlert() {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getContext());
+        alertDialog.setTitle("Folder Add");
+        alertDialog.setMessage("Enter New folder name");
+
+        final EditText input = new EditText(getContext());
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT);
+        input.setLayoutParams(lp);
+        input.setHint("Enter Name");
+        alertDialog.setView(input);
+        alertDialog.setIcon(R.drawable.ic_folder_black_24dp);
+        alertDialog.setPositiveButton("CREATE",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        folderName = input.getText().toString().trim();
+                        if( !folderName.equals("")) {
+                            createDirectory();
+                            loadFragment();
+                        }
+                        else
+                            Toast.makeText(getContext(), "Please enter valid folder name", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+        alertDialog.setNegativeButton("CANCEL",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+        alertDialog.show();
+    }
+
+    private void createDirectory() {
+        String DirectoryPath = Environment.getExternalStorageDirectory()+"/Artwork/"+folderName;
+        File dir = new File(DirectoryPath);
+        if( !dir.exists())
+            dir.mkdir();
+    }
+    private void loadFragment() {
+        HomeFragment alFrag = new HomeFragment();
+        FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+        getActivity().getSupportFragmentManager().popBackStack();
+        fragmentTransaction.replace(R.id.container, alFrag,"HomeFrag");
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
+    }
+
+
+
 }
