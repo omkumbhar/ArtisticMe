@@ -11,13 +11,11 @@ import androidx.fragment.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.Toast;
+
 
 import com.code_crawler.artisticme.Fragments.AlbumFragment;
 import com.code_crawler.artisticme.Fragments.HomeFragment;
@@ -40,6 +38,7 @@ public class HomeActivity extends AppCompatActivity   {
     FragmentManager fragmentManager  ;
     FragmentTransaction ft  ;
     final int REQUEST_CODE_CHOOSE = 9999;
+    private static final int REQUEST_WRITE_PERMISSION = 2712;
     List<Uri> mSelected;
 
     @Override
@@ -47,9 +46,9 @@ public class HomeActivity extends AppCompatActivity   {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         fab                         =  findViewById(R.id.fab);
-        Intent intent               = getIntent();
+        /*Intent intent               = getIntent();
         String name                 = intent.getStringExtra("name");
-        String email                = intent.getStringExtra("email");
+        String email                = intent.getStringExtra("email");*/
         HomeActivity.this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -87,6 +86,14 @@ public class HomeActivity extends AppCompatActivity   {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        //Toast.makeText(this, "Called", Toast.LENGTH_SHORT).show();
+
+        if (requestCode == REQUEST_WRITE_PERMISSION && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            loadFragment();
+        }
+
+
     }
 
 

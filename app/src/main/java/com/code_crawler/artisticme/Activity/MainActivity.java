@@ -9,6 +9,8 @@ import android.os.Environment;
 import android.widget.Toast;
 
 import com.code_crawler.artisticme.Activity.HomeActivity;
+import com.code_crawler.artisticme.FingerAuthActivity;
+import com.code_crawler.artisticme.R;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -23,9 +25,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
         auth = FirebaseAuth.getInstance();
-
-
         createDirectory();
 
 
@@ -64,7 +66,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void launchActivity(FirebaseUser currentUser) {
-        Intent i = new Intent(this, HomeActivity.class);
+        //Intent i = new Intent(this, HomeActivity.class);
+        Intent i = new Intent(this, FingerAuthActivity.class);
         i.putExtra("name",currentUser.getDisplayName());
         i.putExtra("email",currentUser.getEmail());
         startActivity(i);

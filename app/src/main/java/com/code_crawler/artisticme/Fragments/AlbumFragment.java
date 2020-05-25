@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,8 +42,9 @@ public class AlbumFragment extends Fragment implements AlbumAdapter.ItemClickLis
     private RecyclerView imageRecycler;
     public static String folderName;
     private AlbumAdapter albumAdapter;
-    final int REQUEST_CODE_CHOOSE = 9999;
-    List<Uri> mSelected;
+    private final int REQUEST_CODE_CHOOSE = 9999;
+    private List<Uri> mSelected;
+    private Parcelable recyclerViewState;
 
 
 
@@ -133,6 +135,12 @@ public class AlbumFragment extends Fragment implements AlbumAdapter.ItemClickLis
 
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        recyclerViewState = Objects.requireNonNull(imageRecycler.getLayoutManager()).onSaveInstanceState();
+
+    }
 
     private void filePicker() {
         Matisse.from(getActivity())
@@ -172,15 +180,20 @@ public class AlbumFragment extends Fragment implements AlbumAdapter.ItemClickLis
     public void onResume() {
         super.onResume();
 
-        Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if(PermissionsRequest.isPermGranted(getContext()))
-                    loadImagesInView(Objects.requireNonNull(   LoadFiles.loadImages(folderName)   ));
-                else
-                    PermissionsRequest.requestPermission(getActivity());
-            }
-        });
+        if(recyclerViewState != null  )
+
+            imageRecycler.getLayoutManager().onRestoreInstanceState(recyclerViewState);
+
+        else
+            Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if(PermissionsRequest.isPermGranted(getContext()))
+                        loadImagesInView(Objects.requireNonNull(   LoadFiles.loadImages(folderName)   ));
+                    else
+                        PermissionsRequest.requestPermission(getActivity());
+                }
+            });
 
     }
 
