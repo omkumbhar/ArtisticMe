@@ -156,6 +156,8 @@ public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickL
         if (requestCode == REQUEST_WRITE_PERMISSION && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             loadFolders(Objects.requireNonNull(   loadFiles .loadDirectories()   ));
         }
+        else
+            Toast.makeText(getContext(), "To work app we need read and write permissions", Toast.LENGTH_SHORT).show();
 
     }
     // TODO: Rename method, update argument and hook method into UI event

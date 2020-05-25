@@ -8,22 +8,19 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.code_crawler.artisticme.Activity.HomeActivity;
 import com.code_crawler.artisticme.Adapter.AlbumAdapter;
-import com.code_crawler.artisticme.Adapter.RecyclerAdapter;
 import com.code_crawler.artisticme.Methods.CreateDirectory;
 import com.code_crawler.artisticme.Methods.LoadFiles;
 import com.code_crawler.artisticme.Methods.PermissionsRequest;
-import com.code_crawler.artisticme.PhotoViewFragment;
+import com.code_crawler.artisticme.Activity.PhotoViewActivity;
 import com.code_crawler.artisticme.R;
 import com.zhihu.matisse.Matisse;
 import com.zhihu.matisse.MimeType;
@@ -205,24 +202,12 @@ public class AlbumFragment extends Fragment implements AlbumAdapter.ItemClickLis
 
     @Override
     public void onItemClick(View view, int position) {
-       // Toast.makeText(getContext(), position+"   "+ albumAdapter.getItem(position), Toast.LENGTH_SHORT).show();
 
-
-        Bundle args = new Bundle();
-        args.putString("folderName",folderName);
-        args.putInt("Position",position);
-
-        PhotoViewFragment phFragmet = new PhotoViewFragment();
-        phFragmet.setArguments(args);
-
-
-        FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.container, phFragmet,"PhotoFrag");
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
-
-
-
+       // Toast.makeText(getContext(), "position in fragment "+ position, Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(getActivity(), PhotoViewActivity.class);
+        intent.putExtra("folderName",folderName);
+        intent.putExtra("Position",position);
+        startActivity(intent);
 
     }
 

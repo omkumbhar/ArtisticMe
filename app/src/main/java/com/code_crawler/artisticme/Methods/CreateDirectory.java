@@ -48,10 +48,9 @@ public class CreateDirectory {
         for(Uri uri :  filesUri ){
             File file = new File(Objects.requireNonNull(PathUtil.getPath(context, uri)));
             imageUri= Uri.fromFile(file );
-            Toast.makeText(context, "file = "+imageUri, Toast.LENGTH_SHORT).show();
-
+           // Toast.makeText(context, "file = "+imageUri, Toast.LENGTH_SHORT).show();
             target = new File(directoryPath+imageUri.getLastPathSegment());
-            Toast.makeText(context, "Directory path = "+target, Toast.LENGTH_SHORT).show();
+          //  Toast.makeText(context, "Directory path = "+target, Toast.LENGTH_SHORT).show();
             file.renameTo(target);
 
             try {
@@ -132,8 +131,6 @@ public class CreateDirectory {
     }
 
 
-    public boolean getResult(){
-        return this.result;
-    }
+
 
 }

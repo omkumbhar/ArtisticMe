@@ -4,11 +4,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".PhotoViewFragment">
+    tools:context=".Fragments.PhotoViewFragment">
 
-    <androidx.viewpager.widget.ViewPager
+  <!--  <androidx.viewpager.widget.ViewPager
         android:id="@+id/fullViewPager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"/>-->
+
+    <ImageView
+        android:id="@+id/pagerImageView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"/>
 
 </RelativeLayout>

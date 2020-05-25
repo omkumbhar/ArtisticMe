@@ -1,6 +1,5 @@
-package com.code_crawler.artisticme;
+package com.code_crawler.artisticme.Fragments;
 
-import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -11,10 +10,12 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
+import android.widget.ImageView;
 
-import com.code_crawler.artisticme.Activity.HomeActivity;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.bumptech.glide.Glide;
+import com.code_crawler.artisticme.R;
+
+import java.io.File;
 
 
 public class PhotoViewFragment extends Fragment {
@@ -26,7 +27,6 @@ public class PhotoViewFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-
     private OnFragmentInteractionListener mListener;
 
     public PhotoViewFragment() {
@@ -56,15 +56,20 @@ public class PhotoViewFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        Toast.makeText(getContext(), ""+getArguments().getString("folderName"), Toast.LENGTH_SHORT).show();
         return inflater.inflate(R.layout.fragment_photo_view, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ((HomeActivity)getActivity()).getFab().setVisibility(View.GONE);
+
+        ImageView imageView= view.findViewById(R.id.pagerImageView);
+
+        File file = new File(getArguments().getString("ImagePath"));
+        Glide.with(getContext())
+                .load(file)
+                .placeholder(R.drawable.ic_image_black_24dp)
+                .into(imageView);
     }
 
     // TODO: Rename method, update argument and hook method into UI event
