@@ -15,6 +15,7 @@ import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.code_crawler.artisticme.Activity.HomeActivity;
 import com.code_crawler.artisticme.Adapter.AlbumAdapter;
@@ -45,6 +46,8 @@ public class AlbumFragment extends Fragment implements AlbumAdapter.ItemClickLis
     private final int REQUEST_CODE_CHOOSE = 9999;
     private List<Uri> mSelected;
     private Parcelable recyclerViewState;
+    boolean isImagePickCalled = false;
+
 
 
 
@@ -138,11 +141,21 @@ public class AlbumFragment extends Fragment implements AlbumAdapter.ItemClickLis
     @Override
     public void onPause() {
         super.onPause();
-        recyclerViewState = Objects.requireNonNull(imageRecycler.getLayoutManager()).onSaveInstanceState();
+        //Toast.makeText(getActivity(), ""+isImagePickCalled, Toast.LENGTH_SHORT).show();
+        if(isImagePickCalled){
+            isImagePickCalled = false;
+            recyclerViewState = null;
+
+        }else {
+
+            recyclerViewState = Objects.requireNonNull(imageRecycler.getLayoutManager()).onSaveInstanceState();
+        }
 
     }
 
     private void filePicker() {
+        isImagePickCalled = true;
+        //Toast.makeText(getActivity(), "imgpicker", Toast.LENGTH_SHORT).show();
         Matisse.from(getActivity())
                 .choose(MimeType.ofAll())
                 .countable(true)
@@ -153,18 +166,24 @@ public class AlbumFragment extends Fragment implements AlbumAdapter.ItemClickLis
                 .forResult(REQUEST_CODE_CHOOSE );
     }
 
-    @Override
+    /*@Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        Toast.makeText(getActivity(), "fragment", Toast.LENGTH_SHORT).show();
+
+
+
+
         if (requestCode == REQUEST_CODE_CHOOSE && resultCode == -1) {
             mSelected = Matisse.obtainResult(data);
             try {
                 CreateDirectory.moveFiles(mSelected,AlbumFragment.folderName,getContext());
+                Toast.makeText(getActivity(), "fragment", Toast.LENGTH_SHORT).show();
             } catch (URISyntaxException e) {
                 e.printStackTrace();
             }
         }
-    }
+    }*/
 
     private void loadImagesInView(ArrayList<File> imagePaths) {
 
@@ -180,21 +199,21 @@ public class AlbumFragment extends Fragment implements AlbumAdapter.ItemClickLis
     public void onResume() {
         super.onResume();
 
-        if(recyclerViewState != null  )
-
+        if(recyclerViewState != null  ) {
             imageRecycler.getLayoutManager().onRestoreInstanceState(recyclerViewState);
-
-        else
+        }
+        else {
             Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if(PermissionsRequest.isPermGranted(getContext()))
-                        loadImagesInView(Objects.requireNonNull(   LoadFiles.loadImages(folderName)   ));
+                    if (PermissionsRequest.isPermGranted(getContext()))
+                        loadImagesInView(Objects.requireNonNull(LoadFiles.loadImages(folderName)));
                     else
                         PermissionsRequest.requestPermission(getActivity());
                 }
             });
-
+            imageRecycler.scrollToPosition(albumAdapter.getItemCount() - 1);
+        }
     }
 
 
@@ -223,6 +242,9 @@ public class AlbumFragment extends Fragment implements AlbumAdapter.ItemClickLis
         startActivity(intent);
 
     }
+
+
+    public AlbumAdapter getAlbumAdapter(){ return albumAdapter; }
 
     /**
      * This interface must be implemented by activities that contain this

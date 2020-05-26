@@ -13,7 +13,7 @@
         android:roundIcon="@mipmap/ic_app_icon_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".FingerAuthActivity"></activity>
+        <activity android:name=".Activity.FingerAuthActivity"></activity>
         <activity android:name=".Activity.PhotoViewActivity" />
         <activity android:name=".Activity.HomeActivity" />
         <activity android:name=".Activity.MainActivity">

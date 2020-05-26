@@ -72,7 +72,7 @@ public class HomeActivity extends AppCompatActivity   {
             } catch (URISyntaxException e) {
                 e.printStackTrace();
             }
-        }
+}
     }
 
     private void loadFragment() {

@@ -1,4 +1,4 @@
-package com.code_crawler.artisticme;
+package com.code_crawler.artisticme.Activity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -7,9 +7,8 @@ import androidx.fragment.app.FragmentActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Toast;
 
-import com.code_crawler.artisticme.Activity.HomeActivity;
+import com.code_crawler.artisticme.R;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -52,22 +51,11 @@ public class FingerAuthActivity extends AppCompatActivity {
 
             }
         });
-
-
-
-
-
-
          promptInfo = new BiometricPrompt.PromptInfo.Builder()
                 .setTitle("ArtisticMe")
                 .setSubtitle("Authenticate yourself")
                 .setNegativeButtonText("Cancel")
                 .build();
-
-
-
-
-
     }
 
 

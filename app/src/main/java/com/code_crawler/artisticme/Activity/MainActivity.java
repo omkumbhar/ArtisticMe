@@ -8,9 +8,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.widget.Toast;
 
-import com.code_crawler.artisticme.Activity.HomeActivity;
-import com.code_crawler.artisticme.FingerAuthActivity;
-import com.code_crawler.artisticme.R;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
