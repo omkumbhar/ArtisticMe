@@ -2,6 +2,7 @@ package com.code_crawler.artisticme.Fragments;
 
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -56,7 +57,8 @@ public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickL
     private RecyclerView recyView;
     private RecyclerAdapter adapter;
     private LoadFiles loadFiles;
-    String folderName;
+    private String folderName;
+    boolean isMulSelctionOn = false;
 
 
 
@@ -97,11 +99,6 @@ public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickL
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-
-
-
-
-
 
         return inflater.inflate(R.layout.fragment_home, container, false);
     }
@@ -160,25 +157,31 @@ public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickL
             Toast.makeText(getContext(), "To work app we need read and write permissions", Toast.LENGTH_SHORT).show();
 
     }
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
+
     @Override
     public void onItemClick(View view, int position) {
       // Toast.makeText(getContext(), ""+ adapter.getItem(position), Toast.LENGTH_SHORT).show();
+
+        if(!isMulSelctionOn)
+            openFolder(position);
+            // TODO selction on
+        else {
+            Toast.makeText(getActivity(), "taped on "+ position, Toast.LENGTH_SHORT).show();
+            //view.setVisibility(View.GONE);
+            view.setBackgroundColor(Color.parseColor("#33A7FF"));
+        }
+
+
+
+
+    }
+
+    private void openFolder(int position) {
         Bundle args = new Bundle();
         args.putString("folderName",adapter.getItem(position));
         AlbumFragment alFrag = new AlbumFragment();
         alFrag.setArguments(args);
-        FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+        FragmentTransaction fragmentTransaction = Objects.requireNonNull(getActivity()).getSupportFragmentManager().beginTransaction();
         getActivity().getSupportFragmentManager().popBackStack();
         fragmentTransaction.replace(R.id.container, alFrag,"AlbumFrag");
         fragmentTransaction.addToBackStack(null);
@@ -187,22 +190,10 @@ public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickL
 
     @Override
     public void onItemLongClick(View view, int position) {
-        Toast.makeText(getActivity(), "selected : "+position, Toast.LENGTH_SHORT).show();
-    }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+        isMulSelctionOn = true;
+
+        Toast.makeText(getActivity(), "selected : "+position, Toast.LENGTH_SHORT).show();
     }
 
     public void addFolderAlert() {
@@ -246,6 +237,7 @@ public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickL
         if( !dir.exists())
             dir.mkdir();
     }
+
     private void loadFragment() {
         HomeFragment alFrag = new HomeFragment();
         FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
@@ -253,6 +245,20 @@ public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickL
         fragmentTransaction.replace(R.id.container, alFrag,"HomeFrag");
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
+    }
+    /**
+     * This interface must be implemented by activities that contain this
+     * fragment to allow an interaction in this fragment to be communicated
+     * to the activity and potentially other fragments contained in that
+     * activity.
+     * <p>
+     * See the Android Training lesson <a href=
+     * "http://developer.android.com/training/basics/fragments/communicating.html"
+     * >Communicating with Other Fragments</a> for more information.
+     */
+    public interface OnFragmentInteractionListener {
+        // TODO: Update argument type and name
+        void onFragmentInteraction(Uri uri);
     }
 
 

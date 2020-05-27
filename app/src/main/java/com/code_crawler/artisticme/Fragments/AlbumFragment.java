@@ -15,11 +15,10 @@ import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
+
 
 import com.code_crawler.artisticme.Activity.HomeActivity;
 import com.code_crawler.artisticme.Adapter.AlbumAdapter;
-import com.code_crawler.artisticme.Methods.CreateDirectory;
 import com.code_crawler.artisticme.Methods.LoadFiles;
 import com.code_crawler.artisticme.Methods.PermissionsRequest;
 import com.code_crawler.artisticme.Activity.PhotoViewActivity;
@@ -29,7 +28,6 @@ import com.zhihu.matisse.MimeType;
 import com.zhihu.matisse.engine.impl.GlideEngine;
 
 import java.io.File;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -64,8 +62,8 @@ public class AlbumFragment extends Fragment implements AlbumAdapter.ItemClickLis
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
+     * @omkar omk2ar sssss  2.
+     * @param param1 Parametr 1.
      * @param param2 Parameter 2.
      * @return A new instance of fragment AlbumFragment.
      */
@@ -115,11 +113,6 @@ public class AlbumFragment extends Fragment implements AlbumAdapter.ItemClickLis
                         filePicker();
                     }
                 });
-
-
-
-
-
 
         imageRecycler = view.findViewById(R.id.imageRecycler);
         Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
