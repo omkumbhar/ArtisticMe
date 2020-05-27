@@ -173,7 +173,7 @@ public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickL
     }
     @Override
     public void onItemClick(View view, int position) {
-       Toast.makeText(getContext(), ""+ adapter.getItem(position), Toast.LENGTH_SHORT).show();
+      // Toast.makeText(getContext(), ""+ adapter.getItem(position), Toast.LENGTH_SHORT).show();
         Bundle args = new Bundle();
         args.putString("folderName",adapter.getItem(position));
         AlbumFragment alFrag = new AlbumFragment();
@@ -183,6 +183,11 @@ public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickL
         fragmentTransaction.replace(R.id.container, alFrag,"AlbumFrag");
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
+    }
+
+    @Override
+    public void onItemLongClick(View view, int position) {
+        Toast.makeText(getActivity(), "selected : "+position, Toast.LENGTH_SHORT).show();
     }
 
     /**

@@ -45,13 +45,15 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
         return folderNames.size();
     }
 
-    public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,View.OnLongClickListener {
         TextView txtView;
 
         MyViewHolder(@NonNull View itemView) {
             super(itemView);
             txtView =  itemView.findViewById(R.id.folderName);
             itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
+            itemView.setLongClickable(true);
         }
 
         @Override
@@ -59,15 +61,22 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
             if (mClickListener != null) mClickListener.onItemClick(v, getAdapterPosition());
         }
 
+        @Override
+        public boolean onLongClick(View v) {
+            if (mClickListener != null) mClickListener.onItemLongClick(v, getAdapterPosition());
+            return true;
+        }
     }
     public String getItem(int id) {
         return folderNames.get(id);
     }
     public void setClickListener(ItemClickListener itemClickListener) {
         this.mClickListener = itemClickListener;
+
     }
 
     public interface ItemClickListener {
         void onItemClick(View view, int position);
+        void  onItemLongClick(View view, int position);
     }
 }
