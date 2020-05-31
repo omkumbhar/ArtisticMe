@@ -22,11 +22,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.code_crawler.artisticme.Activity.HomeActivity;
 import com.code_crawler.artisticme.Adapter.RecyclerAdapter;
+import com.code_crawler.artisticme.Methods.Deletion;
 import com.code_crawler.artisticme.Methods.LoadFiles;
 import com.code_crawler.artisticme.Methods.PermissionsRequest;
 import com.code_crawler.artisticme.R;
@@ -58,7 +61,11 @@ public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickL
     private RecyclerAdapter adapter;
     private LoadFiles loadFiles;
     private String folderName;
-    boolean isMulSelctionOn = false;
+    private boolean isMulSelectionOn = false;
+    private View appBar;
+    private TextView selectionCountTextView;
+    ImageButton deleteBtn;
+    ArrayList<String> selectedFolders;
 
 
 
@@ -107,6 +114,28 @@ public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickL
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         loadFiles = new LoadFiles(getContext());
 
@@ -162,13 +191,22 @@ public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickL
     public void onItemClick(View view, int position) {
       // Toast.makeText(getContext(), ""+ adapter.getItem(position), Toast.LENGTH_SHORT).show();
 
-        if(!isMulSelctionOn)
+        if(!isMulSelectionOn)
             openFolder(position);
             // TODO selction on
         else {
-            Toast.makeText(getActivity(), "taped on "+ position, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getActivity(), "taped on "+ position, Toast.LENGTH_SHORT).show();
             //view.setVisibility(View.GONE);
-            view.setBackgroundColor(Color.parseColor("#33A7FF"));
+            //view.getBackground().setAlpha(128);
+           // Toast.makeText(getActivity(), ""+, Toast.LENGTH_SHORT).show();
+            if( !(view.getTag()+"").equals("selected")   ){
+                view.setTag("selected");
+                selectedFolders.add( ((TextView)view.findViewById(R.id.folderName)).getText().toString().trim() );
+                view.setBackgroundColor(Color.parseColor("#33A7FF"));
+                selectionCountTextView.setText( (Integer.parseInt(selectionCountTextView.getText().toString().trim()) + 1 )+ "" );
+            }
+
+
         }
 
 
@@ -181,7 +219,8 @@ public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickL
         args.putString("folderName",adapter.getItem(position));
         AlbumFragment alFrag = new AlbumFragment();
         alFrag.setArguments(args);
-        FragmentTransaction fragmentTransaction = Objects.requireNonNull(getActivity()).getSupportFragmentManager().beginTransaction();
+        FragmentTransaction fragmentTransaction = Objects.requireNonNull(getActivity())
+                .getSupportFragmentManager().beginTransaction();
         getActivity().getSupportFragmentManager().popBackStack();
         fragmentTransaction.replace(R.id.container, alFrag,"AlbumFrag");
         fragmentTransaction.addToBackStack(null);
@@ -191,9 +230,52 @@ public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickL
     @Override
     public void onItemLongClick(View view, int position) {
 
-        isMulSelctionOn = true;
+       // TODO : handle second long presssed after firest long pressed
 
-        Toast.makeText(getActivity(), "selected : "+position, Toast.LENGTH_SHORT).show();
+        if(!isMulSelectionOn  ){
+            isMulSelectionOn = true;
+            selectedFolders = new ArrayList<>();
+
+            selectedFolders.add( ((TextView)view.findViewById(R.id.folderName)).getText().toString().trim()   );
+
+
+            view.setTag("selected");
+            changeAppBar();
+            Toast.makeText(getActivity(), "selected : "+position, Toast.LENGTH_SHORT).show();
+            view.setBackgroundColor(Color.parseColor("#33A7FF"));
+        }
+        else {
+            if( !(view.getTag()+"").equals("selected")   ){
+                view.setTag("selected");
+                selectedFolders.add( ((TextView)view.findViewById(R.id.folderName)).getText().toString().trim()   );
+                view.setBackgroundColor(Color.parseColor("#33A7FF"));
+                selectionCountTextView.setText( (Integer.parseInt(selectionCountTextView.getText().toString().trim()) + 1 )+ "" );
+            }
+        }
+    }
+
+    private void changeAppBar() {
+        ((HomeActivity) getActivity()).getSupportActionBar().setDisplayShowCustomEnabled(true);
+        ((HomeActivity) getActivity()).getSupportActionBar().setCustomView(R.layout.folder_app_bar);
+        //getSupportActionBar().setElevation(0);
+        appBar = ((HomeActivity) getActivity()).getSupportActionBar().getCustomView();
+        initializeViews(appBar);
+
+    }
+
+    private void initializeViews(View appBar) {
+        selectionCountTextView = appBar.findViewById(R.id.selectionCount);
+        selectionCountTextView.setText(1+"");
+
+        deleteBtn = appBar.findViewById(R.id.deleteBtn);
+        deleteBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Toast.makeText(getContext(), "DeleteButton pressed", Toast.LENGTH_SHORT).show();
+                Deletion.deleteDir(getActivity(),selectedFolders);
+            }
+        });
+
     }
 
     public void addFolderAlert() {

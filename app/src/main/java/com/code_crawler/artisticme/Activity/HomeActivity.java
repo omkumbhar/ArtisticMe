@@ -2,6 +2,7 @@ package com.code_crawler.artisticme.Activity;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -14,6 +15,7 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Toast;
 
 
@@ -49,6 +51,18 @@ public class HomeActivity extends AppCompatActivity   {
         /*Intent intent               = getIntent();
         String name                 = intent.getStringExtra("name");
         String email                = intent.getStringExtra("email");*/
+
+      //  getActionBar().setIcon(getDrawable());
+
+
+        //this.getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        /*getSupportActionBar().setDisplayShowCustomEnabled(true);
+        getSupportActionBar().setCustomView(R.layout.folder_app_bar);
+        //getSupportActionBar().setElevation(0);
+        View view = getSupportActionBar().getCustomView();*/
+
+
+
         HomeActivity.this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -92,8 +106,6 @@ public class HomeActivity extends AppCompatActivity   {
         if (requestCode == REQUEST_WRITE_PERMISSION && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             loadFragment();
         }
-
-
     }
 
 

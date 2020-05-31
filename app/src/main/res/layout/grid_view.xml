@@ -3,6 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="115dp"
+
+
     android:layout_height="120dp"
     android:background="#000"
     android:adjustViewBounds="true"
@@ -25,11 +27,10 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="-10dp"
         android:textColor="#FFFF"
+
         android:text="@string/folder_name"
 
         />
-
-
 
 
 
