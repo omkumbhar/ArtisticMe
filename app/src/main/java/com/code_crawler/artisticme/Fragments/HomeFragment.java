@@ -6,9 +6,12 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -18,6 +21,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Environment;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -38,15 +44,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Objects;
 
-
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link HomeFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link HomeFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickListener{
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -66,8 +63,8 @@ public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickL
     private TextView selectionCountTextView;
     ImageButton deleteBtn;
     ArrayList<String> selectedFolders;
-
-
+    ActionBar toolbar;
+    int selectedItems = 0;
 
     private OnFragmentInteractionListener mListener;
 
@@ -105,6 +102,9 @@ public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickL
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        setHasOptionsMenu(true); // for menu items
+
         // Inflate the layout for this fragment
 
         return inflater.inflate(R.layout.fragment_home, container, false);
@@ -114,26 +114,6 @@ public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickL
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -160,6 +140,51 @@ public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickL
             PermissionsRequest.requestPermission(getActivity());
 
 
+
+            // Added Arrow button at app bar
+        ((HomeActivity) getActivity()). getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_arrow_back_black_24dp);// set drawable icon
+        ((HomeActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+      //  toolbar = ((HomeActivity) getActivity()).getSupportActionBar();
+
+        changeAppBar();
+        selectionCountTextView.setText("Home");
+
+
+
+        // Handle back button pressed
+
+        /*OnBackPressedCallback callback = new OnBackPressedCallback(isMulSelectionOn) {
+            @Override
+            public void handleOnBackPressed() {
+                // Toast.makeText(getContext(), "Back pressed", Toast.LENGTH_SHORT).show();
+                loadFragment();
+            }
+        };*/
+
+
+        getActivity().getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(isMulSelectionOn) {
+                @Override
+                public void handleOnBackPressed() {
+                     Toast.makeText(getContext(), "Back pressed", Toast.LENGTH_SHORT).show();
+                    loadFragment();
+                }
+            });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     }
     private void loadFolders(ArrayList<File> selectFiles) {
         Uri uri;
@@ -173,7 +198,6 @@ public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickL
         adapter.setClickListener(this);
         recyView.setAdapter(adapter);
 
-
     }
 
     @Override
@@ -184,33 +208,44 @@ public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickL
         }
         else
             Toast.makeText(getContext(), "To work app we need read and write permissions", Toast.LENGTH_SHORT).show();
-
     }
 
     @Override
     public void onItemClick(View view, int position) {
-      // Toast.makeText(getContext(), ""+ adapter.getItem(position), Toast.LENGTH_SHORT).show();
 
         if(!isMulSelectionOn)
             openFolder(position);
-            // TODO selction on
         else {
-            //Toast.makeText(getActivity(), "taped on "+ position, Toast.LENGTH_SHORT).show();
-            //view.setVisibility(View.GONE);
-            //view.getBackground().setAlpha(128);
-           // Toast.makeText(getActivity(), ""+, Toast.LENGTH_SHORT).show();
-            if( !(view.getTag()+"").equals("selected")   ){
-                view.setTag("selected");
+            if( !(view.getTag()+"").equals("selected") && !(view.getTag()+"").equals("")   ){
+
                 selectedFolders.add( ((TextView)view.findViewById(R.id.folderName)).getText().toString().trim() );
+                view.setTag("selected");
                 view.setBackgroundColor(Color.parseColor("#33A7FF"));
-                selectionCountTextView.setText( (Integer.parseInt(selectionCountTextView.getText().toString().trim()) + 1 )+ "" );
+                try {
+                    selectionCountTextView.setText(++selectedItems+"");
+                   //selectionCountTextView.setText( (Integer.parseInt(selectionCountTextView.getText().toString().trim()) + 1 )+ "" );
+                }
+                catch (Exception ex){
+                    Toast.makeText(getActivity(), ""+ex.getMessage(), Toast.LENGTH_SHORT).show();
+                }
             }
-
-
+            else if((view.getTag()+"").equals("selected")) {
+                    deselectItem(view);
+            }
         }
+    }
 
+    private void deselectItem(View view) {
 
-
+        view.setBackgroundColor (Color.parseColor("#E5E5E5"));
+        view.setTag("");
+        selectedFolders.remove(((TextView)view.findViewById(R.id.folderName)).getText().toString().trim());
+       // selectionCountTextView.setText( (Integer.parseInt(selectionCountTextView.getText().toString().trim()) - 1 )+ "" );
+        selectionCountTextView.setText((--selectedItems)+"");
+        if(selectedItems == 0   ) {
+            isMulSelectionOn = false;
+            loadFragment();
+        }
 
     }
 
@@ -230,29 +265,41 @@ public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickL
     @Override
     public void onItemLongClick(View view, int position) {
 
-       // TODO : handle second long presssed after firest long pressed
 
         if(!isMulSelectionOn  ){
-            isMulSelectionOn = true;
-            selectedFolders = new ArrayList<>();
-
-            selectedFolders.add( ((TextView)view.findViewById(R.id.folderName)).getText().toString().trim()   );
-
-
+            onSelection();
+            selectedFolders.add( ((TextView)view.findViewById(R.id.folderName)).getText().toString().trim());
             view.setTag("selected");
-            changeAppBar();
-            Toast.makeText(getActivity(), "selected : "+position, Toast.LENGTH_SHORT).show();
             view.setBackgroundColor(Color.parseColor("#33A7FF"));
+            selectionCountTextView.setText(++selectedItems+"");
+
         }
         else {
             if( !(view.getTag()+"").equals("selected")   ){
                 view.setTag("selected");
                 selectedFolders.add( ((TextView)view.findViewById(R.id.folderName)).getText().toString().trim()   );
                 view.setBackgroundColor(Color.parseColor("#33A7FF"));
-                selectionCountTextView.setText( (Integer.parseInt(selectionCountTextView.getText().toString().trim()) + 1 )+ "" );
+                //selectionCountTextView.setText( (Integer.parseInt(selectionCountTextView.getText().toString().trim()) + 1 )+ "" );
+                selectionCountTextView.setText(++selectedItems+"");
             }
+            else {
+                deselectItem(view);
+
+            }
+
+
+
         }
     }
+
+    private void onSelection() {
+        isMulSelectionOn = true;
+        // To call app bar again
+        getActivity().invalidateOptionsMenu();
+        selectedFolders = new ArrayList<>();
+        changeAppBar();
+    }
+
 
     private void changeAppBar() {
         ((HomeActivity) getActivity()).getSupportActionBar().setDisplayShowCustomEnabled(true);
@@ -265,16 +312,7 @@ public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickL
 
     private void initializeViews(View appBar) {
         selectionCountTextView = appBar.findViewById(R.id.selectionCount);
-        selectionCountTextView.setText(1+"");
-
-        deleteBtn = appBar.findViewById(R.id.deleteBtn);
-        deleteBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //Toast.makeText(getContext(), "DeleteButton pressed", Toast.LENGTH_SHORT).show();
-                Deletion.deleteDir(getActivity(),selectedFolders);
-            }
-        });
+        selectionCountTextView.setText(selectedItems+"");
 
     }
 
@@ -344,5 +382,72 @@ public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickL
     }
 
 
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.folder_menu,menu);
+/*
+        if( selectionCountTextView.getText().equals("0")  )
+            menu.findItem(R.id.deleteDir).setEnabled(false);
+        else
+            menu.findItem(R.id.deleteDir).setEnabled(true);*/
 
+
+        if(!isMulSelectionOn) {
+            menu.setGroupVisible(R.id.normal, true);
+            selectionCountTextView.setText("Home");
+        }
+        else {
+            menu.setGroupVisible(R.id.normal, false);
+            menu.setGroupVisible(R.id.selection, true);
+
+        }
+
+    super.onCreateOptionsMenu(menu, inflater);
+
+    }
+
+
+
+
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+
+
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                if( isMulSelectionOn  ) {
+                    isMulSelectionOn = false;
+                    //selectedFolders = null;
+                    // To call app bar again
+                    //getActivity().invalidateOptionsMenu();
+                    loadFragment();
+                }
+                return true;
+            case R.id.deleteDir:
+                Deletion.deleteDir(getActivity(),selectedFolders);
+                isMulSelectionOn = false;
+                // To call app bar again
+                getActivity().invalidateOptionsMenu();
+                return true;
+            case R.id.allSelection:
+                onSelection();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+
+        }
+
+
+
+
+        // TODO : handle on click menu items
+
+        //return super.onOptionsItemSelected(item);
+
+
+
+
+    }
 }

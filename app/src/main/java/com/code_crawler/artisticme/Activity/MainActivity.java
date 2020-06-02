@@ -63,8 +63,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void launchActivity(FirebaseUser currentUser) {
-        //Intent i = new Intent(this, HomeActivity.class);
-        Intent i = new Intent(this, FingerAuthActivity.class);
+        Intent i = new Intent(this, HomeActivity.class);
+        //Intent i = new Intent(this, FingerAuthActivity.class);
         i.putExtra("name",currentUser.getDisplayName());
         i.putExtra("email",currentUser.getEmail());
         startActivity(i);
