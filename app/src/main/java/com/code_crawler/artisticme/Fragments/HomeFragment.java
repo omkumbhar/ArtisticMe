@@ -65,6 +65,7 @@ public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickL
     ArrayList<String> selectedFolders;
     ActionBar toolbar;
     int selectedItems = 0;
+    ArrayList<String>  folderNames;
 
     private OnFragmentInteractionListener mListener;
 
@@ -174,26 +175,14 @@ public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickL
 
 
 
-
-
-
-
-
-
-
-
-
-
-
     }
     private void loadFolders(ArrayList<File> selectFiles) {
         Uri uri;
-        ArrayList<String>  folderNames = new ArrayList<>();
+        folderNames = new ArrayList<>();
         for (File file : selectFiles){
             uri =Uri.fromFile(file);
             folderNames.add( uri.getLastPathSegment() );
         }
-
         adapter = new RecyclerAdapter(getContext(),folderNames);
         adapter.setClickListener(this);
         recyView.setAdapter(adapter);
@@ -212,42 +201,19 @@ public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickL
 
     @Override
     public void onItemClick(View view, int position) {
-
         if(!isMulSelectionOn)
             openFolder(position);
         else {
-            if( !(view.getTag()+"").equals("selected") && !(view.getTag()+"").equals("")   ){
-
-                selectedFolders.add( ((TextView)view.findViewById(R.id.folderName)).getText().toString().trim() );
-                view.setTag("selected");
-                view.setBackgroundColor(Color.parseColor("#33A7FF"));
-                try {
-                    selectionCountTextView.setText(++selectedItems+"");
-                   //selectionCountTextView.setText( (Integer.parseInt(selectionCountTextView.getText().toString().trim()) + 1 )+ "" );
-                }
-                catch (Exception ex){
-                    Toast.makeText(getActivity(), ""+ex.getMessage(), Toast.LENGTH_SHORT).show();
-                }
+            if( !view.isSelected()   ){
+                selectItem(view,position);
             }
-            else if((view.getTag()+"").equals("selected")) {
-                    deselectItem(view);
+            else if(  view.isSelected()   ) {
+                    deselectItem(view,position);
             }
         }
     }
 
-    private void deselectItem(View view) {
 
-        view.setBackgroundColor (Color.parseColor("#E5E5E5"));
-        view.setTag("");
-        selectedFolders.remove(((TextView)view.findViewById(R.id.folderName)).getText().toString().trim());
-       // selectionCountTextView.setText( (Integer.parseInt(selectionCountTextView.getText().toString().trim()) - 1 )+ "" );
-        selectionCountTextView.setText((--selectedItems)+"");
-        if(selectedItems == 0   ) {
-            isMulSelectionOn = false;
-            loadFragment();
-        }
-
-    }
 
     private void openFolder(int position) {
         Bundle args = new Bundle();
@@ -265,31 +231,46 @@ public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickL
     @Override
     public void onItemLongClick(View view, int position) {
 
-
         if(!isMulSelectionOn  ){
             onSelection();
-            selectedFolders.add( ((TextView)view.findViewById(R.id.folderName)).getText().toString().trim());
-            view.setTag("selected");
-            view.setBackgroundColor(Color.parseColor("#33A7FF"));
-            selectionCountTextView.setText(++selectedItems+"");
-
+            selectItem(view,position);
         }
         else {
-            if( !(view.getTag()+"").equals("selected")   ){
-                view.setTag("selected");
-                selectedFolders.add( ((TextView)view.findViewById(R.id.folderName)).getText().toString().trim()   );
-                view.setBackgroundColor(Color.parseColor("#33A7FF"));
-                //selectionCountTextView.setText( (Integer.parseInt(selectionCountTextView.getText().toString().trim()) + 1 )+ "" );
-                selectionCountTextView.setText(++selectedItems+"");
+            if( !view.isSelected()  ){
+                selectItem(view,position);
             }
             else {
-                deselectItem(view);
-
+                deselectItem(view,position);
             }
-
-
-
         }
+
+
+    }
+
+    private void selectItem(View view, int position) {
+        view.setSelected(true);
+        selectedFolders.add(folderNames.get(position) );
+        view.setBackgroundColor(Color.parseColor("#33A7FF"));
+        view.setAlpha(0.6f);
+        try {
+            selectionCountTextView.setText(++selectedItems+"");
+        }
+        catch (Exception ex){
+            Toast.makeText(getActivity(), ""+ex.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+    private void deselectItem(View view,int position) {
+
+        view.setSelected(false);
+        view.setBackgroundColor (Color.parseColor("#E5E5E5"));
+        view.setAlpha(1f);
+        selectedFolders.remove(folderNames.get(position) );
+        --selectedItems;
+        if(selectedItems == 0   ) {
+            isMulSelectionOn = false;
+            loadFragment();
+        }else
+            selectionCountTextView.setText((selectedItems)+"");
     }
 
     private void onSelection() {
@@ -304,7 +285,6 @@ public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickL
     private void changeAppBar() {
         ((HomeActivity) getActivity()).getSupportActionBar().setDisplayShowCustomEnabled(true);
         ((HomeActivity) getActivity()).getSupportActionBar().setCustomView(R.layout.folder_app_bar);
-        //getSupportActionBar().setElevation(0);
         appBar = ((HomeActivity) getActivity()).getSupportActionBar().getCustomView();
         initializeViews(appBar);
 
