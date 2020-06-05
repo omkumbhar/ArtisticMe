@@ -3,12 +3,17 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="115dp"
-
-
     android:layout_height="120dp"
     android:background="#E5E5E5"
     android:adjustViewBounds="true"
     android:layout_margin="3dp">
+
+
+    <View
+        android:id="@+id/hoverView"
+        android:elevation="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
     <ImageView
         android:id="@+id/folderImage"
@@ -27,7 +32,6 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="-10dp"
         android:textColor="#000"
-
         android:text="@string/folder_name"
 
         />

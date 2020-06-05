@@ -15,6 +15,7 @@ import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 
 import com.code_crawler.artisticme.Activity.HomeActivity;
@@ -115,6 +116,7 @@ public class AlbumFragment extends Fragment implements AlbumAdapter.ItemClickLis
                 });
 
         imageRecycler = view.findViewById(R.id.imageRecycler);
+
         Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -179,6 +181,7 @@ public class AlbumFragment extends Fragment implements AlbumAdapter.ItemClickLis
     }*/
 
     private void loadImagesInView(ArrayList<File> imagePaths) {
+
 
         if( imagePaths != null  ){
             albumAdapter = new AlbumAdapter(getContext(),imagePaths);

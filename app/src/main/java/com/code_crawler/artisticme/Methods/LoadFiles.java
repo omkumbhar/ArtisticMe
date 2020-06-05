@@ -7,13 +7,10 @@ import java.io.File;
 import java.util.ArrayList;
 
 public class LoadFiles {
-    private Context context;
     private static String directoryPath = Environment.getExternalStorageDirectory()+"/Artwork";
 
 
-    public LoadFiles(Context context) {
-        this.context = context;
-    }
+    public LoadFiles() {}
 
     public ArrayList<File> loadDirectories(){
 

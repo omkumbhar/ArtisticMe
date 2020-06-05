@@ -1,12 +1,13 @@
 package com.code_crawler.artisticme.Activity;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.widget.Toast;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
@@ -23,11 +24,30 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        //getSupportActionBar().hide();
 
-        auth = FirebaseAuth.getInstance();
+      Thread thread = new Thread(new Runnable() {
+          @Override
+          public void run() {
+
+              auth = FirebaseAuth.getInstance();
+              createDirectory();
+              if (auth.getCurrentUser() == null){
+                  Intent signInIntent = AuthUI.getInstance()
+                          .createSignInIntentBuilder()
+                          .setIsSmartLockEnabled(false)
+                          .setAvailableProviders(providers)
+                          .build();
+                  startActivityForResult(signInIntent,9999);
+              }else{
+                  launchActivity(auth.getCurrentUser());
+              }
+          }
+      });
+      thread.start();
+
+        /*auth = FirebaseAuth.getInstance();
         createDirectory();
-
-
         if (auth.getCurrentUser() == null){
             Intent signInIntent = AuthUI.getInstance()
                     .createSignInIntentBuilder()
@@ -37,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
             startActivityForResult(signInIntent,9999);
         }else{
             launchActivity(auth.getCurrentUser());
-        }
+        }*/
 
 
     }
@@ -72,4 +92,11 @@ public class MainActivity extends AppCompatActivity {
         //Toast.makeText(this, "Already logged in user", Toast.LENGTH_SHORT).show();
 
     }
+
+
+
+
+
+
+
 }

@@ -14,12 +14,6 @@
             />
     </group>
 
-
-
-
-
-
-
     <group android:id="@+id/selection"
         android:visible="false">
 
