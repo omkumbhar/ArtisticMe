@@ -38,8 +38,10 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.MyViewHolder
         Glide.with(context)
                 .load(imagePaths.get(position))
                 .centerCrop()
-                .placeholder(R.drawable.ic_image_black_24dp)
+                .placeholder(R.mipmap.ic_app_icon_round /*R.drawable.ic_image_black_24dp*/)
                 .into(holder.imageView);
+
+
     }
 
     @Override
@@ -47,7 +49,7 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.MyViewHolder
         return imagePaths.size();
     }
 
-    public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,View.OnLongClickListener {
         ImageView imageView;
 
         public MyViewHolder(@NonNull View itemView) {
@@ -55,6 +57,8 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.MyViewHolder
 
             imageView = itemView.findViewById(R.id.albumImage);
             itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
+
         }
 
 
@@ -62,10 +66,25 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.MyViewHolder
         public void onClick(View v) {
             if (mClickListener != null) mClickListener.onItemClick(v, getAdapterPosition());
         }
+
+        @Override
+        public boolean onLongClick(View v) {
+            if (mClickListener != null) mClickListener.onItemLongClick(v, getAdapterPosition());
+            return true;
+        }
     }
+
+
+    //To retain changes made in view in that view only
+    @Override
+    public int getItemViewType(int position) {
+        return position;
+    }
+
     public String getItem(int id) {
         return imagePaths.get(id).toString();
     }
+
     public void setClickListener(ItemClickListener itemClickListener) {
         this.mClickListener = itemClickListener;
     }
@@ -73,5 +92,6 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.MyViewHolder
 
     public interface ItemClickListener {
         void onItemClick(View view, int position);
+        void  onItemLongClick(View view, int position);
     }
 }

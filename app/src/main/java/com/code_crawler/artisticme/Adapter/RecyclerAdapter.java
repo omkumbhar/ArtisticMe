@@ -45,6 +45,12 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
         return folderNames.size();
     }
 
+    //To retain changes made in view in that view only
+    @Override
+    public int getItemViewType(int position) {
+        return position;
+    }
+
     public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,View.OnLongClickListener {
         TextView txtView;
 

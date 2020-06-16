@@ -43,6 +43,7 @@ import com.code_crawler.artisticme.R;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.Vector;
 
 public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickListener{
     // TODO: Rename parameter arguments, choose names that match
@@ -59,13 +60,14 @@ public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickL
     private LoadFiles loadFiles;
     private String folderName;
     private boolean isMulSelectionOn = false;
-    private View appBar;
+    static View appBar;
     private TextView selectionCountTextView;
-    ArrayList<String> selectedFolders;
-    int selectedItems = 0;
-    ArrayList<String>  folderNames;
-    OnBackPressedCallback callback;
+    private ArrayList<String> selectedFolders;
+    private int selectedItems = 0;
+    private ArrayList<String>  folderNames;  // make it static
+    private OnBackPressedCallback callback;
     private  ArrayList<View> selectedViews;
+
 
     private OnFragmentInteractionListener mListener;
 
@@ -160,20 +162,13 @@ public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickL
         getActivity().getOnBackPressedDispatcher().addCallback(this, callback );
 
 
-
-
-
-
-
     }
 
     private void deSelectedViews(ArrayList<View> selectedViews) {
 
         //Method to deselect the view and show normal to them
-        changeAppBar();
-        selectionCountTextView.setText("Home");
-        getActivity().invalidateOptionsMenu();
         isMulSelectionOn = false;
+        getActivity().invalidateOptionsMenu();
         selectedFolders = null;
         selectedItems = 0;
         callback.setEnabled(false);
@@ -182,10 +177,8 @@ public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickL
         for( View view : selectedViews){
             view.setSelected(false);
 
-            view.findViewById(R.id.hoverView).setBackgroundColor(0x00000000);
+            //view.findViewById(R.id.hoverView).setBackgroundColor(0x00000000);
             view.findViewById(R.id.hoverView).setAlpha(0f);
-
-
         }
         selectedViews = null;
 
@@ -226,7 +219,7 @@ public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickL
             if( !view.isSelected()   ){
                 selectItem(view,position);
             }
-            else if(  view.isSelected()   ) {
+            else {
                     deselectItem(view,position);
             }
         }
@@ -281,6 +274,8 @@ public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickL
         view.findViewById(R.id.hoverView).setAlpha(0.6f);
 
 
+
+
         selectedViews.add(view);
         try {
             selectionCountTextView.setText(++selectedItems+"");
@@ -293,15 +288,12 @@ public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickL
         //When user click on selected item remove from selected items
         view.setSelected(false);
 
-
-        /*view.setBackgroundColor (Color.parseColor("#E5E5E5"));
-        view.setAlpha(1f);*/
-
         view.findViewById(R.id.hoverView).setBackgroundColor(0x00000000);
         view.findViewById(R.id.hoverView).setAlpha(0f);
 
         selectedViews.remove(view);
         selectedFolders.remove(folderNames.get(position) );
+
         --selectedItems;
         if(selectedItems == 0   ) {
             deSelectedViews(selectedViews);
@@ -315,6 +307,7 @@ public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickL
         getActivity().invalidateOptionsMenu();
         selectedFolders = new ArrayList<>();
         selectedViews = new ArrayList<>();
+
         changeAppBar();
        // Assign on back pressed when selection is on
         callback.setEnabled(isMulSelectionOn);
@@ -433,6 +426,7 @@ public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickL
                 isMulSelectionOn = false;
                 // To call app bar again
                 getActivity().invalidateOptionsMenu();
+
                 return true;
             case R.id.allSelection:
                 onSelection();
@@ -440,16 +434,20 @@ public class HomeFragment extends Fragment implements RecyclerAdapter.ItemClickL
             case  R.id.folderRename:
                 if(selectedItems < 1  )
                     Toast.makeText(getActivity(), "Please select at least one folder", Toast.LENGTH_SHORT).show();
-                else if( selectedItems == 1 )
+                else if( selectedItems == 1 ) {
                     Toast.makeText(getActivity(), "Rename", Toast.LENGTH_SHORT).show();
+
+                }
                 else
                     Toast.makeText(getActivity(), "Please select only one folder", Toast.LENGTH_SHORT).show();
+                return true;
+            case  R.id.allSettings:
+                folderNames.remove(0);
+                adapter.notifyItemRemoved(0);
 
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
-
-
-
 }

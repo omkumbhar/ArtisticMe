@@ -1,25 +1,42 @@
 package com.code_crawler.artisticme.Fragments;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Parcelable;
+import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
 import com.code_crawler.artisticme.Activity.HomeActivity;
 import com.code_crawler.artisticme.Adapter.AlbumAdapter;
+import com.code_crawler.artisticme.Methods.DeleteFiles;
+import com.code_crawler.artisticme.Methods.Deletion;
 import com.code_crawler.artisticme.Methods.LoadFiles;
 import com.code_crawler.artisticme.Methods.PermissionsRequest;
 import com.code_crawler.artisticme.Activity.PhotoViewActivity;
@@ -32,6 +49,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.Executor;
+import java.util.concurrent.FutureTask;
 
 
 public class AlbumFragment extends Fragment implements AlbumAdapter.ItemClickListener {
@@ -43,9 +62,21 @@ public class AlbumFragment extends Fragment implements AlbumAdapter.ItemClickLis
     public static String folderName;
     private AlbumAdapter albumAdapter;
     private final int REQUEST_CODE_CHOOSE = 9999;
-    private List<Uri> mSelected;
     private Parcelable recyclerViewState;
     boolean isImagePickCalled = false;
+    boolean isMulSelectionOn = false;
+    private View appBar;
+    private TextView selectionCountTextView;
+    private int selectedItems = 0;
+
+    private ArrayList<File> imagePaths ;
+    ArrayList<File> selectedImages;
+
+    private OnBackPressedCallback callback;
+
+    private  ArrayList<View> selectedViews;
+
+    TextView textView;
 
 
 
@@ -92,6 +123,8 @@ public class AlbumFragment extends Fragment implements AlbumAdapter.ItemClickLis
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
 
+        // Show menu items on app bar
+        setHasOptionsMenu(true);
 
         assert getArguments() != null;
         folderName = getArguments().getString("folderName");
@@ -106,6 +139,11 @@ public class AlbumFragment extends Fragment implements AlbumAdapter.ItemClickLis
         ((HomeActivity)getActivity()).getFab().setVisibility(View.VISIBLE);
         super.onViewCreated(view, savedInstanceState);
 
+        //Change app bar text
+        changeAppBar();
+         /*selectionCountTextView  = HomeFragment.appBar.findViewById(R.id.selectionCount);
+        selectionCountTextView .setText(folderName);*/
+        //getActivity().invalidateOptionsMenu();
 
         ((HomeActivity) Objects.requireNonNull(getActivity())).getFab()
                 .setOnClickListener(new View.OnClickListener() {
@@ -121,12 +159,33 @@ public class AlbumFragment extends Fragment implements AlbumAdapter.ItemClickLis
             @Override
             public void run() {
                 imageRecycler.setLayoutManager(new GridLayoutManager(getContext(),4));
-                if(PermissionsRequest.isPermGranted(getContext()))
-                    loadImagesInView(Objects.requireNonNull(   LoadFiles.loadImages(folderName)   ));
+                if(PermissionsRequest.isPermGranted(getContext())) {
+                    imagePaths = new ArrayList<>();
+                    imagePaths = LoadFiles.loadImages(folderName);
+                    loadImagesInView(Objects.requireNonNull( imagePaths   ));
+                }
                 else
                     PermissionsRequest.requestPermission(getActivity());
             }
         });
+
+
+
+
+
+
+        // Handle back button pressed
+        callback = new OnBackPressedCallback(false) {
+            @Override
+            public void handleOnBackPressed() {
+                deselectAllItems(selectedViews);
+            }
+        };
+        //Adding back button pressed to listener
+        getActivity().getOnBackPressedDispatcher().addCallback(this, callback );
+
+
+
 
 
 
@@ -231,16 +290,138 @@ public class AlbumFragment extends Fragment implements AlbumAdapter.ItemClickLis
     @Override
     public void onItemClick(View view, int position) {
 
-       // Toast.makeText(getContext(), "position in fragment "+ position, Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(getActivity(), PhotoViewActivity.class);
-        intent.putExtra("folderName",folderName);
-        intent.putExtra("Position",position);
-        startActivity(intent);
+        if(!isMulSelectionOn){
+            showImageFullScreen(position);
+        }
+        else {
+            if( !view.isSelected()  ){
+                // Show selected UI to view if multi selected is on and view is not selected
+                selectItem(view,position);
+            }
+            else {
+                // Deselcted if view is selected
+                deselectItem(view,position);
+            }
+
+        }
+
+
+    }
+
+    private void deselectItem(View view, int position) {
+        //view.findViewById(R.id.hoverView).setBackgroundColor(Color.parseColor("#33A7FF"));
+        view.findViewById(R.id.hoverView).setAlpha(0f);
+        view.setSelected(false);
+        selectedImages.remove(imagePaths.get(position));
+        selectedViews.remove(view);
+
+
+        --selectedItems;
+
+        if(selectedItems == 0 )
+        {
+            //Toast.makeText(getActivity(), ""+selectedItems, Toast.LENGTH_SHORT).show();
+            isMulSelectionOn = false;
+            getActivity().invalidateOptionsMenu();
+            //changeAppBar();
+            deselectAllItems(selectedViews);
+        }
+        else {
+            selectionCountTextView.setText( selectedItems+"");
+        }
+
+
+
+    }
+
+    private void deselectAllItems(ArrayList<View> selectedViews) {
+
+        isMulSelectionOn = false;
+        getActivity().invalidateOptionsMenu();
+        selectedImages = null;
+        selectedItems = 0;
+        callback.setEnabled(false);
+
+        for( View view : selectedViews){
+            view.setSelected(false);
+            //view.findViewById(R.id.hoverView).setBackgroundColor(0x00000000);
+            view.findViewById(R.id.hoverView).setAlpha(0f);
+
+
+        }
+        selectedViews = null;
+
+        //ENABLING FAB button
+        ((HomeActivity) Objects.requireNonNull(getActivity())).getFab().setClickable(true);
+        ((HomeActivity) Objects.requireNonNull(getActivity())).getFab().setAlpha(1f);
+    }
+
+    private void selectItem(View view, int position) {
+        view.findViewById(R.id.hoverView).setBackgroundColor(Color.parseColor("#33A7FF"));
+        view.findViewById(R.id.hoverView).setAlpha(0.6f);
+        view.setSelected(true);
+
+        selectionCountTextView.setText( ++selectedItems+"");
+        selectedImages.add(imagePaths.get(position));
+        selectedViews.add(view);
 
     }
 
 
-    public AlbumAdapter getAlbumAdapter(){ return albumAdapter; }
+    @Override
+    public void onItemLongClick(View view, int position) {
+
+
+        if(!isMulSelectionOn){
+            //Toast.makeText(getActivity(), ""+position, Toast.LENGTH_SHORT).show();
+            onselection();
+            selectItem(view,position);
+
+        }
+        else {
+            if( !view.isSelected()  ){
+                // Show selected UI to view if multi selected is on and view is not selected
+                selectItem(view,position);
+            }
+            else {
+                // Deselected if view is selected
+                deselectItem(view,position);
+            }
+        }
+    }
+
+    private void onselection() {
+        isMulSelectionOn = true;
+        getActivity().invalidateOptionsMenu();
+        callback.setEnabled(true);
+        selectedImages  = new ArrayList<>();
+        selectedViews = new ArrayList<>();
+
+        ((HomeActivity) Objects.requireNonNull(getActivity())).getFab().setClickable(false);
+        ((HomeActivity) Objects.requireNonNull(getActivity())).getFab().setAlpha(0.5f);
+
+
+    }
+    private void changeAppBar() {
+        //Change app bar
+        ((HomeActivity) getActivity()).getSupportActionBar().setDisplayShowCustomEnabled(true);
+        ((HomeActivity) getActivity()).getSupportActionBar().setCustomView(R.layout.folder_app_bar);
+
+        // get instance of the app bar
+        appBar = ((HomeActivity) getActivity()).getSupportActionBar().getCustomView();
+        selectionCountTextView = appBar.findViewById(R.id.selectionCount);
+
+    }
+
+
+    private void showImageFullScreen(int position) {
+        Intent intent = new Intent(getActivity(), PhotoViewActivity.class);
+        intent.putExtra("folderName",folderName);
+        intent.putExtra("Position",position);
+        startActivity(intent);
+    }
+
+
 
     /**
      * This interface must be implemented by activities that contain this
@@ -256,4 +437,164 @@ public class AlbumFragment extends Fragment implements AlbumAdapter.ItemClickLis
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
+
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.album_menu,menu);
+
+
+        //Toast.makeText(getActivity(), " onCreateOptionsMenu  ", Toast.LENGTH_SHORT).show();
+
+        if(!isMulSelectionOn) {
+            menu.setGroupVisible(R.id.normal, true);
+            selectionCountTextView .setText(folderName);
+        }
+        else {
+            menu.setGroupVisible(R.id.normal, false);
+            menu.setGroupVisible(R.id.selection, true);
+        }
+
+
+
+
+
+
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                getActivity().onBackPressed();
+                return true;
+
+            case R.id.deleteImg:
+               // Toast.makeText(getActivity(), "delete", Toast.LENGTH_SHORT).show();
+                deleteShow(selectedImages);
+                //Deletion.addFolderAlert(getActivity());
+                //Deletion.deleteImages(getActivity(), selectedImages);
+                /*isMulSelectionOn = false;
+                // To call app bar again
+                getActivity().invalidateOptionsMenu();
+                imagePaths = LoadFiles.loadImages(folderName);
+                loadImagesInView(Objects.requireNonNull( imagePaths ));
+                albumAdapter.notifyDataSetChanged();*/
+
+                return true;
+
+            default:
+
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void deleteShow(ArrayList<File> selectedImages) {
+
+
+        //Create Alert builder to show progress of deleting images
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("Deleting");
+
+        LinearLayout layout = new LinearLayout(getContext());
+        layout.setGravity(Gravity.CENTER);
+        //layout.setBackgroundColor( Color.parseColor("#62C82A"));
+
+        View view = getActivity().getLayoutInflater().inflate(R.layout.delete_alert, null);
+
+        layout.addView(view);
+        builder.setView(layout);
+
+        //AsyncTask task to delete files
+        final DeleteFiles deleteFiles = new DeleteFiles(view);
+        deleteFiles.execute(selectedImages);
+
+
+        builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                dialog.cancel();
+                deleteFiles.cancel(true);
+            }
+        });
+
+
+        builder.show();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        /* AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Deleting");
+        View view = getActivity().getLayoutInflater().inflate(R.layout.delete_alert, null);
+        builder.setView(view);
+        builder.show();
+        DeleteFiles deleteFiles = new DeleteFiles(view);
+        deleteFiles.execute(selectedImages);*/
+
+
+
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
