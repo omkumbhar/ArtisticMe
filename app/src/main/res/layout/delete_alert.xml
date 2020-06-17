@@ -2,8 +2,6 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:padding="2dp"
-    android:gravity="center"
     android:layout_height="match_parent">
 
     <ProgressBar
@@ -18,11 +16,11 @@
         style="?android:attr/progressBarStyleHorizontal"/>
     <TextView
         android:id="@+id/progressCounter"
-        android:layout_width="45dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="100%"
         android:gravity="center"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="5dp"
         android:layout_toEndOf="@+id/progressBar"
         android:textColor="#000"
         android:textSize="18sp"/>

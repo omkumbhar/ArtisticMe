@@ -19,13 +19,19 @@
 
         <!--<item
             android:id="@+id/folderRename"
-            android:title="Rename" />-->
+            android:title="Rename"  />-->
         <!--BUTTONS WITH ICONS-->
+        <item
+            android:id="@+id/shareImg"
+            android:title="Share"
+            app:showAsAction ="ifRoom"
+            android:icon="@drawable/ic_share_black_24dp"/>
         <item
             android:id="@+id/deleteImg"
             android:title="Delete"
-            app:showAsAction="always"
+            app:showAsAction ="ifRoom"
             android:icon="@drawable/ic_delete_black_24dp"/>
+
     </group>
 
 

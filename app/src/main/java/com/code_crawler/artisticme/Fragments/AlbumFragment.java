@@ -12,6 +12,7 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -38,6 +39,7 @@ import com.code_crawler.artisticme.Adapter.AlbumAdapter;
 import com.code_crawler.artisticme.Methods.DeleteFiles;
 import com.code_crawler.artisticme.Methods.Deletion;
 import com.code_crawler.artisticme.Methods.LoadFiles;
+import com.code_crawler.artisticme.Methods.PathUtil;
 import com.code_crawler.artisticme.Methods.PermissionsRequest;
 import com.code_crawler.artisticme.Activity.PhotoViewActivity;
 import com.code_crawler.artisticme.R;
@@ -220,24 +222,6 @@ public class AlbumFragment extends Fragment implements AlbumAdapter.ItemClickLis
                 .forResult(REQUEST_CODE_CHOOSE );
     }
 
-    /*@Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        Toast.makeText(getActivity(), "fragment", Toast.LENGTH_SHORT).show();
-
-
-
-
-        if (requestCode == REQUEST_CODE_CHOOSE && resultCode == -1) {
-            mSelected = Matisse.obtainResult(data);
-            try {
-                CreateDirectory.moveFiles(mSelected,AlbumFragment.folderName,getContext());
-                Toast.makeText(getActivity(), "fragment", Toast.LENGTH_SHORT).show();
-            } catch (URISyntaxException e) {
-                e.printStackTrace();
-            }
-        }
-    }*/
 
     private void loadImagesInView(ArrayList<File> imagePaths) {
 
@@ -299,7 +283,7 @@ public class AlbumFragment extends Fragment implements AlbumAdapter.ItemClickLis
                 selectItem(view,position);
             }
             else {
-                // Deselcted if view is selected
+                // Deselected if view is selected
                 deselectItem(view,position);
             }
 
@@ -340,7 +324,7 @@ public class AlbumFragment extends Fragment implements AlbumAdapter.ItemClickLis
         getActivity().invalidateOptionsMenu();
         selectedImages = null;
         selectedItems = 0;
-        callback.setEnabled(false);
+        callback.setEnabled(false); // handle back pressed
 
         for( View view : selectedViews){
             view.setSelected(false);
@@ -360,20 +344,15 @@ public class AlbumFragment extends Fragment implements AlbumAdapter.ItemClickLis
         view.findViewById(R.id.hoverView).setBackgroundColor(Color.parseColor("#33A7FF"));
         view.findViewById(R.id.hoverView).setAlpha(0.6f);
         view.setSelected(true);
-
         selectionCountTextView.setText( ++selectedItems+"");
         selectedImages.add(imagePaths.get(position));
         selectedViews.add(view);
-
     }
 
 
     @Override
     public void onItemLongClick(View view, int position) {
-
-
         if(!isMulSelectionOn){
-            //Toast.makeText(getActivity(), ""+position, Toast.LENGTH_SHORT).show();
             onselection();
             selectItem(view,position);
 
@@ -396,33 +375,25 @@ public class AlbumFragment extends Fragment implements AlbumAdapter.ItemClickLis
         callback.setEnabled(true);
         selectedImages  = new ArrayList<>();
         selectedViews = new ArrayList<>();
-
         ((HomeActivity) Objects.requireNonNull(getActivity())).getFab().setClickable(false);
         ((HomeActivity) Objects.requireNonNull(getActivity())).getFab().setAlpha(0.5f);
-
 
     }
     private void changeAppBar() {
         //Change app bar
         ((HomeActivity) getActivity()).getSupportActionBar().setDisplayShowCustomEnabled(true);
         ((HomeActivity) getActivity()).getSupportActionBar().setCustomView(R.layout.folder_app_bar);
-
         // get instance of the app bar
         appBar = ((HomeActivity) getActivity()).getSupportActionBar().getCustomView();
         selectionCountTextView = appBar.findViewById(R.id.selectionCount);
 
     }
-
-
     private void showImageFullScreen(int position) {
         Intent intent = new Intent(getActivity(), PhotoViewActivity.class);
         intent.putExtra("folderName",folderName);
         intent.putExtra("Position",position);
         startActivity(intent);
     }
-
-
-
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -437,15 +408,9 @@ public class AlbumFragment extends Fragment implements AlbumAdapter.ItemClickLis
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
-
-
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.album_menu,menu);
-
-
-        //Toast.makeText(getActivity(), " onCreateOptionsMenu  ", Toast.LENGTH_SHORT).show();
-
         if(!isMulSelectionOn) {
             menu.setGroupVisible(R.id.normal, true);
             selectionCountTextView .setText(folderName);
@@ -454,147 +419,62 @@ public class AlbumFragment extends Fragment implements AlbumAdapter.ItemClickLis
             menu.setGroupVisible(R.id.normal, false);
             menu.setGroupVisible(R.id.selection, true);
         }
-
-
-
-
-
-
         super.onCreateOptionsMenu(menu, inflater);
     }
-
-
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-
         switch (item.getItemId()) {
             case android.R.id.home:
                 getActivity().onBackPressed();
                 return true;
-
             case R.id.deleteImg:
-               // Toast.makeText(getActivity(), "delete", Toast.LENGTH_SHORT).show();
                 deleteShow(selectedImages);
-                //Deletion.addFolderAlert(getActivity());
-                //Deletion.deleteImages(getActivity(), selectedImages);
-                /*isMulSelectionOn = false;
-                // To call app bar again
-                getActivity().invalidateOptionsMenu();
-                imagePaths = LoadFiles.loadImages(folderName);
-                loadImagesInView(Objects.requireNonNull( imagePaths ));
-                albumAdapter.notifyDataSetChanged();*/
-
                 return true;
-
+            case R.id.shareImg:
+                shareImages(selectedImages);
+                return true;
             default:
-
                 return super.onOptionsItemSelected(item);
         }
     }
+    private void shareImages(ArrayList<File> selectedImages) {
+        ArrayList<Uri> imageUris = new ArrayList<Uri>();
+        for(File file : selectedImages){
+            imageUris.add(PathUtil.getImageContentUri (getContext(),file)); // Add your image URIs here
+        }
+        //Call intent to share files and only support content:// uri
+        Intent shareIntent = new Intent();
+        shareIntent.setAction(Intent.ACTION_SEND_MULTIPLE);
+        shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, imageUris);
+        shareIntent.setType("image/*");
+        startActivity(Intent.createChooser(shareIntent, "Share images to.."));
+    }
 
     private void deleteShow(ArrayList<File> selectedImages) {
-
-
+        AlertDialog alert;
         //Create Alert builder to show progress of deleting images
         final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle("Deleting");
-
         LinearLayout layout = new LinearLayout(getContext());
         layout.setGravity(Gravity.CENTER);
         //layout.setBackgroundColor( Color.parseColor("#62C82A"));
-
         View view = getActivity().getLayoutInflater().inflate(R.layout.delete_alert, null);
-
         layout.addView(view);
         builder.setView(layout);
-
         //AsyncTask task to delete files
         final DeleteFiles deleteFiles = new DeleteFiles(view);
         deleteFiles.execute(selectedImages);
-
-
         builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-
                 dialog.cancel();
                 deleteFiles.cancel(true);
             }
         });
-
-
-        builder.show();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        /* AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("Deleting");
-        View view = getActivity().getLayoutInflater().inflate(R.layout.delete_alert, null);
-        builder.setView(view);
-        builder.show();
-        DeleteFiles deleteFiles = new DeleteFiles(view);
-        deleteFiles.execute(selectedImages);*/
-
-
-
-
+        alert = builder.create();
+        deleteFiles.setAlertDialog(alert);
+        alert.show();
+        // deselect all items
+        deselectAllItems( selectedViews);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }

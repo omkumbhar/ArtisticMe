@@ -7,6 +7,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 
+import androidx.appcompat.app.AlertDialog;
+
 import com.code_crawler.artisticme.R;
 
 import java.io.File;
@@ -17,6 +19,7 @@ public class DeleteFiles extends AsyncTask<ArrayList<File>, Integer,Boolean> {
 
     @SuppressLint("StaticFieldLeak")
     private View view;
+    AlertDialog alert;
     @SuppressLint("StaticFieldLeak")
     private ProgressBar progressBar;
     private TextView textView;
@@ -27,10 +30,20 @@ public class DeleteFiles extends AsyncTask<ArrayList<File>, Integer,Boolean> {
         textView = view.findViewById(R.id.progressCounter);
     }
 
+    public void setAlertDialog(AlertDialog alert){
+        this.alert = alert;
+    }
+
     @Override
     protected Boolean doInBackground(ArrayList<File>... arrayLists) {
 
+        //Deletion.addFolderAlert(getActivity());
+        //Deletion.deleteImages(getActivity(), selectedImages);
+
         for (int i =0;i<101;i++){
+
+
+
             publishProgress(i);
             try {
                 Thread.sleep(100);
@@ -42,6 +55,7 @@ public class DeleteFiles extends AsyncTask<ArrayList<File>, Integer,Boolean> {
 
 
 
+
         return true;
     }
 
@@ -50,5 +64,9 @@ public class DeleteFiles extends AsyncTask<ArrayList<File>, Integer,Boolean> {
         super.onProgressUpdate(values);
         progressBar.setProgress(values[0]);
         textView.setText(values[0]+"%");
+
+        if(values[0] == 100) alert.cancel();
+
+
     }
 }
